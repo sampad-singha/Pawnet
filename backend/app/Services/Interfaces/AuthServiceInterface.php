@@ -12,4 +12,6 @@ interface AuthServiceInterface
     public function logout(User $user): void;
     public function getUser(): ?User;
     public function refreshToken(User $user): array;
+    public function setPassword(User $user, string $newPassword): void;
+    public function changePassword(User $user, string $currentPassword, string $newPassword): void;
 }
