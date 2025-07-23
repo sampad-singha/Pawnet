@@ -57,14 +57,16 @@ class UserRepository implements UserRepositoryInterface
             return $user;
         }
 
-        return User::create([
+        $newUser = User::create([
             'name' => $googleUser->getName(),
             'email' => $googleUser->getEmail(),
             'google_id' => $googleUser->getId(),
             'password' => bcrypt(Str::random(16)),
-            'set_password' => false,
             'email_verified_at' => now(),
         ]);
+        $newUser->set_password = false; // Set password to false for Google users
+        $newUser->save();
+        return $newUser;
 
     }
 
