@@ -1,7 +1,7 @@
 <?php
 // app/Services/Interfaces/AuthServiceInterface.php
 
-namespace App\Services\Interfaces;
+namespace App\Services\Auth\Interfaces;
 
 interface GoogleAuthServiceInterface
 {

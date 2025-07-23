@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\API\Auth;
 
+use App\Exceptions\API\Auth\InvalidCredentialsException;
 use App\Http\Controllers\Controller;
-use App\Services\Interfaces\AuthServiceInterface;
+use App\Services\Auth\Interfaces\AuthServiceInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use App\Exceptions\API\Auth\InvalidCredentialsException;
+use Jenssegers\Agent\Agent;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
-use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
@@ -35,13 +35,15 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
+
         $credentials = $request->validate([
             'email' => 'required|string|email',
             'password' => 'required|string',
         ]);
+        $userAgent = $request->header('User-Agent') ?? 'Unknown device';
 
         try {
-            $response = $this->authService->login($credentials);
+            $response = $this->authService->login($credentials,$userAgent);
             return response()->json($response, 200);
         } catch (InvalidCredentialsException $e) {
             return response()->json(['error' => $e->getMessage()], 401);
@@ -51,7 +53,22 @@ class AuthController extends Controller
         }
     }
 
-    public function logout()
+    public function logout(Request $request)
+    {
+        $user = auth()->user();
+
+        if (!$user) {
+            throw new UnauthorizedHttpException('', 'Unauthorized');
+        }
+
+        $userAgent = $request->header('User-Agent') ?? null;
+
+        $this->authService->logout($user, $userAgent);
+
+        return response()->json(['message' => 'Logged out successfully'], 200);
+    }
+
+    public function logoutAll(Request $request)
     {
         $user = auth()->user();
 
@@ -60,10 +77,11 @@ class AuthController extends Controller
         }
 
         $this->authService->logout($user);
-        return response()->json(['message' => 'Logged out successfully'], 200);
+
+        return response()->json(['message' => 'All sessions logged out successfully'], 200);
     }
 
-    public function refreshToken()
+    public function refreshToken(Request $request)
     {
         $user = auth()->user();
 
@@ -71,9 +89,12 @@ class AuthController extends Controller
             throw new UnauthorizedHttpException('', 'Unauthorized');
         }
 
-        $response = $this->authService->refreshToken($user);
+        $userAgent = $request->header('User-Agent') ?? 'Unknown device';
+
+        $response = $this->authService->refreshToken($user, $userAgent);
         return response()->json($response, 200);
     }
+
 
     public function setPassword(Request $request)
     {

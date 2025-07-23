@@ -3,9 +3,8 @@
 namespace App\Http\Controllers\API\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Services\GoogleAuthService;
+use App\Services\Auth\GoogleAuthService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class GoogleAuthController extends Controller
 {

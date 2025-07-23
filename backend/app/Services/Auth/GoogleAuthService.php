@@ -1,9 +1,9 @@
 <?php
-namespace App\Services;
+namespace App\Services\Auth;
 
-use App\Services\Interfaces\GoogleAuthServiceInterface;
-use Laravel\Socialite\Facades\Socialite;
 use App\Repositories\UserRepository;
+use App\Services\Auth\Interfaces\GoogleAuthServiceInterface;
+use Laravel\Socialite\Facades\Socialite;
 
 class GoogleAuthService implements GoogleAuthServiceInterface
 {

@@ -1,21 +1,19 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Auth;
 
 use App\Exceptions\API\Auth\InvalidCredentialsException;
 use App\Models\User;
 use App\Repositories\Interfaces\UserRepositoryInterface;
-use App\Services\Interfaces\AuthServiceInterface;
+use App\Services\Auth\Interfaces\AuthServiceInterface;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\ValidationException;
-use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class AuthService implements AuthServiceInterface
 {
     public function __construct(
-        private UserRepositoryInterface $userRepository
+        private UserRepositoryInterface $userRepository,
+        protected TokenNameService $tokenNameService
     ) {}
 
     public function register(array $data): User
@@ -27,13 +25,13 @@ class AuthService implements AuthServiceInterface
         $token = $user->createToken('auth_token')->plainTextToken;
 
         // Don’t expose entire model directly
-        return $user->setAttribute('token', $token)->makeHidden(['password', 'email_verified_at']);
+        return $user->setAttribute('token', $token);
     }
 
     /**
      * @throws InvalidCredentialsException
      */
-    public function login(array $credentials): array
+    public function login(array $credentials, string $userAgent): array
     {
         $email = Str::lower(trim($credentials['email']));
         $user = $this->userRepository->findByEmail($email);
@@ -42,32 +40,39 @@ class AuthService implements AuthServiceInterface
             throw new InvalidCredentialsException('Invalid credentials');
         }
 
-        return $this->generateAuthResponse($user);
+        return $this->generateAuthResponse($user, $userAgent);
     }
 
-    public function logout(User $user): void
+    public function logout(User $user, ?string $userAgent = null): void
     {
-        // You can log this action for auditing
-        $user->tokens()->delete();
+        if ($userAgent) {
+            $tokenName = $this->tokenNameService->generate($userAgent);
+            $user->tokens()->where('name', $tokenName)->delete();
+            $user->currentAccessToken()?->delete();
+        } else {
+            // If no userAgent provided, delete all tokens (optional fallback)
+            $user->tokens()->delete();
+        }
     }
 
     public function getUser(): ?User
     {
-        return auth()->user()?->makeHidden(['password', 'email_verified_at']);
+        return auth()->user();
     }
 
-    public function refreshToken(User $user): array
+    public function refreshToken(User $user, string $userAgent): array
     {
         $this->logout($user); // Revoke all tokens
-        return $this->generateAuthResponse($user);
+        return $this->generateAuthResponse($user,$userAgent);
     }
 
-    private function generateAuthResponse(User $user): array
+    private function generateAuthResponse(User $user, string $userAgent): array
     {
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $tokenName = $this->tokenNameService->generate($userAgent); // handles user-agent, platform, etc.
+        $token = $user->createToken($tokenName)->plainTextToken;
 
         return [
-            'user' => $user->makeHidden(['password', 'email_verified_at']),
+            'user' => $user,
             'token' => $token,
             'token_type' => 'Bearer'
         ];
