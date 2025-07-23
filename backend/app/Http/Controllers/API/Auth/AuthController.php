@@ -3,12 +3,17 @@
 namespace App\Http\Controllers\API\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Services\Interfaces\AuthServiceInterface;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use App\Exceptions\API\Auth\InvalidCredentialsException;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
     public function __construct(
-        private \App\Services\Interfaces\AuthServiceInterface $authService
+        private AuthServiceInterface $authService
     ) {}
 
     public function register(Request $request)
@@ -18,9 +23,14 @@ class AuthController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
         ]);
-        $user = $this->authService->register($data);
 
-        return response()->json(['user' => $user], 201);
+        try {
+            $user = $this->authService->register($data);
+            return response()->json(['user' => $user], 201);
+        } catch (\Throwable $e) {
+            Log::error('Registration failed', ['error' => $e->getMessage()]);
+            return response()->json(['error' => 'Registration failed'], 500);
+        }
     }
 
     public function login(Request $request)
@@ -33,28 +43,64 @@ class AuthController extends Controller
         try {
             $response = $this->authService->login($credentials);
             return response()->json($response, 200);
-        } catch (\Exception $e) {
+        } catch (InvalidCredentialsException $e) {
             return response()->json(['error' => $e->getMessage()], 401);
+        } catch (\Throwable $e) {
+            Log::error('Login error', ['error' => $e->getMessage()]);
+            return response()->json(['error' => 'Login failed'], 500);
         }
     }
 
     public function logout()
     {
-        $user = $this->authService->getUser();
-        if ($user) {
-            $this->authService->logout($user);
-            return response()->json(['message' => 'Logged out successfully'], 200);
+        $user = auth()->user();
+
+        if (!$user) {
+            throw new UnauthorizedHttpException('', 'Unauthorized');
         }
-        return response()->json(['error' => 'Unauthorized'], 401);
+
+        $this->authService->logout($user);
+        return response()->json(['message' => 'Logged out successfully'], 200);
     }
 
     public function refreshToken()
     {
-        $user = $this->authService->getUser();
-        if ($user) {
-            $response = $this->authService->refreshToken($user);
-            return response()->json($response, 200);
+        $user = auth()->user();
+
+        if (!$user) {
+            throw new UnauthorizedHttpException('', 'Unauthorized');
         }
-        return response()->json(['error' => 'Unauthorized'], 401);
+
+        $response = $this->authService->refreshToken($user);
+        return response()->json($response, 200);
+    }
+
+    public function setPassword(Request $request)
+    {
+        $data = $request->validate([
+            'new_password' => 'required|string|min:8|confirmed',
+        ]);
+
+        try {
+            $this->authService->setPassword(auth()->user(), $data['new_password']);
+            return response()->json(['message' => 'Password set successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 403);
+        }
+    }
+
+    public function changePassword(Request $request)
+    {
+        $data = $request->validate([
+            'current_password' => 'required|string',
+            'new_password' => 'required|string|min:8|confirmed',
+        ]);
+
+        try {
+            $this->authService->changePassword(auth()->user(), $data['current_password'], $data['new_password']);
+            return response()->json(['message' => 'Password changed successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 403);
+        }
     }
 }

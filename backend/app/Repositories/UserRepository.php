@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Str;
 
 class UserRepository implements UserRepositoryInterface
 {
@@ -46,4 +47,25 @@ class UserRepository implements UserRepositoryInterface
     {
         return User::paginate($perPage);
     }
+
+    public function findOrCreateGoogleUser($googleUser): User
+    {
+        $user = User::where('email', $googleUser->getEmail())->first();
+
+        if ($user) {
+            $user->update(['google_id' => $googleUser->getId()]);
+            return $user;
+        }
+
+        return User::create([
+            'name' => $googleUser->getName(),
+            'email' => $googleUser->getEmail(),
+            'google_id' => $googleUser->getId(),
+            'password' => bcrypt(Str::random(16)),
+            'set_password' => false,
+            'email_verified_at' => now(),
+        ]);
+
+    }
+
 }
