@@ -1,6 +1,7 @@
 <?php
 namespace App\Services\Auth;
 
+use App\Events\NewLogin;
 use App\Exceptions\API\Auth\InvalidCredentialsException;
 use App\Models\User;
 use App\Repositories\Interfaces\UserRepositoryInterface;
@@ -39,7 +40,7 @@ class AuthService implements AuthServiceInterface
         if (!$user || !Hash::check($credentials['password'], $user->password)) {
             throw new InvalidCredentialsException('Invalid credentials');
         }
-
+        event(new NewLogin($user));
         return $this->generateAuthResponse($user, $userAgent);
     }
 
