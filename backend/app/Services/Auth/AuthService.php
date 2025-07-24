@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Services\Auth;
 
 use App\Exceptions\API\Auth\InvalidCredentialsException;
@@ -26,7 +25,6 @@ class AuthService implements AuthServiceInterface
         $user = $this->userRepository->create($data);
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        // Don’t expose entire model directly
         return $user->setAttribute('token', $token);
     }
 
@@ -52,7 +50,6 @@ class AuthService implements AuthServiceInterface
             $user->tokens()->where('name', $tokenName)->delete();
             $user->currentAccessToken()?->delete();
         } else {
-            // If no userAgent provided, delete all tokens (optional fallback)
             $user->tokens()->delete();
         }
     }
@@ -64,13 +61,13 @@ class AuthService implements AuthServiceInterface
 
     public function refreshToken(User $user, string $userAgent): array
     {
-        $this->logout($user); // Revoke all tokens
-        return $this->generateAuthResponse($user,$userAgent);
+        $this->logout($user);
+        return $this->generateAuthResponse($user, $userAgent);
     }
 
     private function generateAuthResponse(User $user, string $userAgent): array
     {
-        $tokenName = $this->tokenNameService->generate($userAgent); // handles user-agent, platform, etc.
+        $tokenName = $this->tokenNameService->generate($userAgent);
         $token = $user->createToken($tokenName)->plainTextToken;
 
         return [
@@ -89,9 +86,8 @@ class AuthService implements AuthServiceInterface
             throw new \Exception('Password already set.');
         }
 
-        $user->password = Hash::make($newPassword);
-        $user->set_password = true;
-        $user->save();
+        $this->userRepository->updatePassword($user, Hash::make($newPassword));
+        $this->userRepository->markPasswordSet($user);
     }
 
     public function changePassword(User $user, string $currentPassword, string $newPassword): void
@@ -100,8 +96,7 @@ class AuthService implements AuthServiceInterface
             throw new \Exception('Current password is incorrect.');
         }
 
-        $user->password = Hash::make($newPassword);
-        $user->save();
+        $this->userRepository->updatePassword($user, Hash::make($newPassword));
     }
 
     public function sendResetLink(string $email): void
@@ -120,9 +115,8 @@ class AuthService implements AuthServiceInterface
         $status = Password::reset(
             $data,
             function ($user, $password) {
-                $user->password = bcrypt($password);
-                $user->set_password = true; // If you track password set status
-                $user->save();
+                $this->userRepository->updatePassword($user, bcrypt($password));
+                $this->userRepository->markPasswordSet($user);
             }
         );
 

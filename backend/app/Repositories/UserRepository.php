@@ -64,10 +64,27 @@ class UserRepository implements UserRepositoryInterface
             'password' => bcrypt(Str::random(16)),
             'email_verified_at' => now(),
         ]);
-        $newUser->set_password = false; // Set password to false for Google users
+        $newUser->set_password = false;
         $newUser->save();
-        return $newUser;
 
+        return $newUser;
     }
 
+    public function save(User $user): User
+    {
+        $user->save();
+        return $user;
+    }
+
+    public function updatePassword(User $user, string $hashedPassword): void
+    {
+        $user->password = $hashedPassword;
+        $this->save($user);
+    }
+
+    public function markPasswordSet(User $user): void
+    {
+        $user->set_password = true;
+        $this->save($user);
+    }
 }
