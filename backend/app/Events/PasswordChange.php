@@ -11,7 +11,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class NewLogin
+class PasswordChange
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -33,7 +33,7 @@ class NewLogin
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('new-login.' . $this->user->id),
+            new PrivateChannel('password-change.' . $this->user->id),
         ];
     }
 }

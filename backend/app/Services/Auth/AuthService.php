@@ -2,10 +2,12 @@
 namespace App\Services\Auth;
 
 use App\Events\NewLogin;
+use App\Events\PasswordChange;
 use App\Exceptions\API\Auth\InvalidCredentialsException;
 use App\Models\User;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Services\Auth\Interfaces\AuthServiceInterface;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
@@ -89,6 +91,7 @@ class AuthService implements AuthServiceInterface
 
         $this->userRepository->updatePassword($user, Hash::make($newPassword));
         $this->userRepository->markPasswordSet($user);
+        event(new PasswordChange($user));
     }
 
     public function changePassword(User $user, string $currentPassword, string $newPassword): void
@@ -98,6 +101,7 @@ class AuthService implements AuthServiceInterface
         }
 
         $this->userRepository->updatePassword($user, Hash::make($newPassword));
+        event(new PasswordChange($user));
     }
 
     public function sendResetLink(string $email): void
@@ -118,6 +122,7 @@ class AuthService implements AuthServiceInterface
             function ($user, $password) {
                 $this->userRepository->updatePassword($user, bcrypt($password));
                 $this->userRepository->markPasswordSet($user);
+                event(new PasswordChange($user));
             }
         );
 
@@ -126,5 +131,6 @@ class AuthService implements AuthServiceInterface
                 'token' => __($status),
             ]);
         }
+
     }
 }
