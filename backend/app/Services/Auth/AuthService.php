@@ -7,7 +7,9 @@ use App\Models\User;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Services\Auth\Interfaces\AuthServiceInterface;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class AuthService implements AuthServiceInterface
 {
@@ -100,5 +102,34 @@ class AuthService implements AuthServiceInterface
 
         $user->password = Hash::make($newPassword);
         $user->save();
+    }
+
+    public function sendResetLink(string $email): void
+    {
+        $status = Password::sendResetLink(['email' => $email]);
+
+        if ($status !== Password::RESET_LINK_SENT) {
+            throw ValidationException::withMessages([
+                'email' => __($status),
+            ]);
+        }
+    }
+
+    public function resetPassword(array $data): void
+    {
+        $status = Password::reset(
+            $data,
+            function ($user, $password) {
+                $user->password = bcrypt($password);
+                $user->set_password = true; // If you track password set status
+                $user->save();
+            }
+        );
+
+        if ($status !== Password::PASSWORD_RESET) {
+            throw ValidationException::withMessages([
+                'token' => __($status),
+            ]);
+        }
     }
 }

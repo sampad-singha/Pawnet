@@ -14,4 +14,6 @@ interface AuthServiceInterface
     public function refreshToken(User $user, string $userAgent): array;
     public function setPassword(User $user, string $newPassword): void;
     public function changePassword(User $user, string $currentPassword, string $newPassword): void;
+    public function sendResetLink(string $email): void;
+    public function resetPassword(array $data): void;
 }
