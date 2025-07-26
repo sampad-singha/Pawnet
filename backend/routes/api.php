@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\Auth\AuthController;
+use App\Http\Controllers\API\Auth\FacebookAuthController;
 use App\Http\Controllers\API\Auth\GoogleAuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -17,10 +18,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/user/change-password', [AuthController::class, 'changePassword']);
     Route::post('/refresh-token', [AuthController::class, 'refreshToken']);
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/logout-all', [AuthController::class, 'logoutAll']);
 });
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.reset');
 
 //Google Authentication Routes
 Route::prefix('auth/google')->group(function () {
     Route::get('/redirect', [GoogleAuthController::class, 'redirect']);
     Route::get('/callback', [GoogleAuthController::class, 'callback']);
+});
+Route::prefix('auth/facebook')->group(function () {
+    Route::get('/redirect', [FacebookAuthController::class, 'redirect']);
+    Route::get('/callback', [FacebookAuthController::class, 'callback']);
 });
