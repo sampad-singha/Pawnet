@@ -87,4 +87,24 @@ class UserRepository implements UserRepositoryInterface
         $user->set_password = true;
         $this->save($user);
     }
+
+    public function findOrCreateFacebookUser($fbUser): User
+    {
+        $user = User::where('email', $fbUser->getEmail())->first();
+        if ($user) {
+            $user->update(['facebook_id' => $fbUser->getId()]);
+            return $user;
+        }
+        $newUser = User::create([
+            'name' => $fbUser->getName(),
+            'email' => $fbUser->getEmail(),
+            'facebook_id' => $fbUser->getId(),
+            'password' => bcrypt(Str::random(16)),
+            'email_verified_at' => now(),
+        ]);
+        $newUser->set_password = false;
+        $newUser->save();
+
+        return $newUser;
+    }
 }

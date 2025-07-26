@@ -23,6 +23,7 @@ class User extends Authenticatable
         'email',
         'password',
         'google_id',
+        'facebook_id',
         'email_verified_at',
     ];
 
@@ -36,6 +37,7 @@ class User extends Authenticatable
         'remember_token',
         'set_password',
         'google_id',
+        'facebook_id',
         'email_verified_at',
     ];
 
