@@ -5,7 +5,8 @@ import axios from './Api.jsx';  // Axios instance
 import Home from './pages/Home.jsx';  // Private route
 import Login from './pages/Login.jsx';  // Public route
 import Register from './pages/Register.jsx';  // Public route
-import Dashboard from './pages/Dashboard.jsx';  // Private route
+import Dashboard from './pages/Dashboard.jsx';
+import GoogleCallback from "./components/GoogleCallback.jsx";  // Private route
 
 // Component for handling private routes
 const PrivateRoute = ({ children }) => {
@@ -34,6 +35,7 @@ function App() {
                 {/* Public routes */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/auth/google/callback" element={<GoogleCallback />} />
 
                 {/* Private routes */}
                 <Route

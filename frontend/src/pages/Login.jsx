@@ -1,9 +1,8 @@
-// Login.jsx
-
 import React, { useState } from 'react';
 import { Button, Container, Box, Typography, Input, FormControl, FormLabel, Link } from '@mui/joy';
-import { Google as GoogleIcon, Facebook as FacebookIcon } from '@mui/icons-material';
-import api from "../Api.jsx"; // Import the icons
+import api from "../Api.jsx"; // Import the API service
+import {Facebook as FacebookIcon } from '@mui/icons-material';
+import GoogleLogin from "../components/GoogleLogin.jsx";
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -59,31 +58,30 @@ const Login = () => {
                 </Typography>
 
                 <form onSubmit={handleSubmit}>
-                    <FormControl  margin="normal">
+                    <FormControl margin="normal">
                         <FormLabel>Email</FormLabel>
                         <Input
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="Enter your email"
-                            sx={{ width: '100%' }}  // Ensure full width styling
+                            sx={{ width: '100%' }} // Ensure full width styling
                         />
                     </FormControl>
 
-                    <FormControl  margin="normal">
+                    <FormControl margin="normal">
                         <FormLabel>Password</FormLabel>
                         <Input
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="Enter your password"
-                            sx={{ width: '100%' }}  // Ensure full width styling
+                            sx={{ width: '100%' }} // Ensure full width styling
                         />
                     </FormControl>
 
                     <Button
                         type="submit"
-                        
                         variant="soft"
                         color="primary"
                         sx={{ marginTop: 2 }}
@@ -111,14 +109,7 @@ const Login = () => {
                         marginTop: 3,
                     }}
                 >
-                    <Button
-                        variant="soft"
-                        color="google"
-                        startDecorator={<GoogleIcon />}
-                        sx={{ marginRight: 2 }}
-                    >
-                        Google
-                    </Button>
+                    <GoogleLogin />
                     <Button
                         variant="soft"
                         color="facebook"
