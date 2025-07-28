@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import api from "../Api.jsx";
+import { Link } from 'react-router-dom';
 
 const Dashboard = () => {
     const [user, setUser] = useState(null);
@@ -33,6 +34,9 @@ const Dashboard = () => {
                 <div>
                     <h1>Welcome, {user.name}!</h1>
                     <p>Email: {user.email}</p>
+                    <Link to="/logout">
+                        <button>Logout</button>
+                    </Link>
                 </div>
             ) : (
                 <p>Loading user profile...</p>

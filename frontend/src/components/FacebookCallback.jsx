@@ -14,7 +14,7 @@ const FacebookCallback = () => {
             // Redirect to dashboard after successful login
             navigate('/dashboard');
         }
-    }, [navigate]);
+    }, []);
 
     return <div>Loading...</div>;
 };
