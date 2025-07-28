@@ -2,10 +2,7 @@
 import React from 'react';
 import axios from '../Api';
 import {Button} from "@mui/joy";  // Import your Axios instance
-
-function FacebookIcon() {
-    return null;
-}
+import {Facebook as FacebookIcon } from '@mui/icons-material';
 
 const FacebookLogin = () => {
     const handleFacebookLogin = async () => {
