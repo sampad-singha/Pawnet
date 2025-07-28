@@ -6,11 +6,12 @@ import Home from './pages/Home.jsx';  // Private route
 import Login from './pages/Login.jsx';  // Public route
 import Register from './pages/Register.jsx';  // Public route
 import Dashboard from './pages/Dashboard.jsx';
-import GoogleCallback from "./components/GoogleCallback.jsx";  // Private route
+import GoogleCallback from "./components/GoogleCallback.jsx";
+import FacebookCallback from "./components/FacebookCallback.jsx";  // Private route
 
 // Component for handling private routes
 const PrivateRoute = ({ children }) => {
-    const [auth, setAuth] = useState(true);  // State to manage authentication status
+    const [auth, setAuth] = useState(null);  // Use null to signify loading
 
     useEffect(() => {
         // Check if the user is authenticated by looking for the token
@@ -25,8 +26,13 @@ const PrivateRoute = ({ children }) => {
         }
     }, []);
 
+    if (auth === null) {
+        return <div>Loading...</div>;  // Show loading until authentication check is complete
+    }
+
     return auth ? children : <Navigate to="/login" />;  // Redirect to login if not authenticated
 };
+
 
 function App() {
     return (
@@ -36,6 +42,7 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/auth/google/callback" element={<GoogleCallback />} />
+                <Route path="/auth/facebook/callback" element={<FacebookCallback />} /> {/* Use the same component for Facebook callback */}
 
                 {/* Private routes */}
                 <Route

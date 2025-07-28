@@ -3,6 +3,7 @@ import { Button, Container, Box, Typography, Input, FormControl, FormLabel, Link
 import api from "../Api.jsx"; // Import the API service
 import {Facebook as FacebookIcon } from '@mui/icons-material';
 import GoogleLogin from "../components/GoogleLogin.jsx";
+import FacebookLogin from "../components/FacebookLogin.jsx";
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -110,13 +111,7 @@ const Login = () => {
                     }}
                 >
                     <GoogleLogin />
-                    <Button
-                        variant="soft"
-                        color="facebook"
-                        startDecorator={<FacebookIcon />}
-                    >
-                        Facebook
-                    </Button>
+                    <FacebookLogin />
                 </Box>
             </Box>
         </Container>
