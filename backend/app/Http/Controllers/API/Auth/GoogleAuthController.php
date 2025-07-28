@@ -27,13 +27,15 @@ class GoogleAuthController extends Controller
     /**
      * Handle Google callback and return user info + token
      */
-    public function callback(): JsonResponse
+    public function callback()
     {
         $data = $this->googleAuthService->handleGoogleCallback();
+        $token = $data['token'];
 
-        return response()->json([
-            'user' => $data['user'],
-            'token' => $data['token'],
-        ]);
+//        return response()->json([
+//            'user' => $data['user'],
+//            'token' => $data['token'],
+//        ]);
+        return redirect("http://localhost:5173/auth/google/callback?token=$token");
     }
 }

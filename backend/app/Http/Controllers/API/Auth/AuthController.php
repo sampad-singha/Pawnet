@@ -153,4 +153,15 @@ class AuthController extends Controller
             return response()->json(['error' => $e->errors()], 422);
         }
     }
+
+    public function verifyToken(Request $request)
+    {
+        // If the token is valid, return a success message
+        if ($request->user()) {
+            return response()->json(['message' => 'Token is valid']);
+        }
+
+        // If the token is invalid, return a 401 Unauthorized error
+        return response()->json(['message' => 'Token is invalid'], 401);
+    }
 }

@@ -24,13 +24,16 @@ class FacebookAuthController extends Controller
     /**
      * Handle Facebook callback and return user info + token
      */
-    public function callback(): JsonResponse
+    public function callback()
     {
         $data = $this->facebookAuthService->handleFacebookCallback();
 
-        return response()->json([
-            'user' => $data['user'],
-            'token' => $data['token'],
-        ]);
+//        return response()->json([
+//            'user' => $data['user'],
+//            'token' => $data['token'],
+//        ]);
+        $redirectUrl = config('app.frontend_url') . '/auth/facebook/callback?token=' . $data['token'];
+//        dd($redirectUrl);
+        return redirect($redirectUrl);
     }
 }

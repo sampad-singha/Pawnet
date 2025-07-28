@@ -14,6 +14,7 @@ Route::post('/register', [AuthController::class, 'register']);
 //Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('throttle:5,1')->post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/user/verify-token', [AuthController::class, 'verifyToken']);
     Route::post('/user/set-password', [AuthController::class, 'setPassword']);
     Route::post('/user/change-password', [AuthController::class, 'changePassword']);
     Route::post('/refresh-token', [AuthController::class, 'refreshToken']);
