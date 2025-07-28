@@ -3,8 +3,10 @@
 
 namespace App\Providers;
 
-use App\Services\AuthService;
-use App\Services\Interfaces\AuthServiceInterface;
+use App\Services\Auth\AuthService;
+use App\Services\Auth\GoogleAuthService;
+use App\Services\Auth\Interfaces\AuthServiceInterface;
+use App\Services\Auth\Interfaces\GoogleAuthServiceInterface;
 use Illuminate\Support\ServiceProvider;
 
 class ServiceServiceProvider extends ServiceProvider
@@ -15,5 +17,10 @@ class ServiceServiceProvider extends ServiceProvider
             AuthServiceInterface::class,
             AuthService::class
         );
+        $this->app->bind(
+            GoogleAuthServiceInterface::class,
+            GoogleAuthService::class
+        );
+
     }
 }

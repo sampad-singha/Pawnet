@@ -16,4 +16,8 @@ interface UserRepositoryInterface
     public function update(int $id, array $data): User;
     public function delete(int $id): bool;
     public function paginate(int $perPage = 15): Paginator;
+    public function findOrCreateGoogleUser($googleUser): User;
+    public function save(User $user): User;
+    public function updatePassword(User $user, string $hashedPassword): void;
+    public function markPasswordSet(User $user): void;
 }
