@@ -15,11 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('friend_id')->constrained('users')->cascadeOnDelete();
-            $table->enum('status', ['pending', 'accepted', 'blocked', 'rejected'])->default('pending');
-            $table->timestamp('accepted_at')->nullable();
-            $table->timestamp('blocked_at')->nullable();
-            $table->timestamp('rejected_at')->nullable();
-            $table->timestamp('requested_at')->nullable();
+            $table->enum('status', ['pending', 'accepted'])->default('pending');
             $table->timestamps();
             $table->unique(['user_id', 'friend_id']);
             $table->unique(['friend_id', 'user_id']); // Ensure uniqueness in both directions

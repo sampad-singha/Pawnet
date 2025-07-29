@@ -3,6 +3,7 @@
 use App\Http\Controllers\API\Auth\AuthController;
 use App\Http\Controllers\API\Auth\FacebookAuthController;
 use App\Http\Controllers\API\Auth\GoogleAuthController;
+use App\Http\Controllers\API\User\FriendController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -32,4 +33,14 @@ Route::prefix('auth/google')->group(function () {
 Route::prefix('auth/facebook')->group(function () {
     Route::get('/redirect', [FacebookAuthController::class, 'redirect']);
     Route::get('/callback', [FacebookAuthController::class, 'callback']);
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/friends', [FriendController::class, 'getFriends']);
+    Route::post('/friend-request/{friendId}', [FriendController::class, 'sendFriendRequest']);
+    Route::post('/accept-request/{friendId}', [FriendController::class, 'acceptFriendRequest']);
+    Route::post('/reject-request/{friendId}', [FriendController::class, 'rejectFriendRequest']);
+    Route::post('/unfriend/{friendId}', [FriendController::class, 'deleteFriend']);
+    Route::get('/friends/pending', [FriendController::class, 'getPendingRequests']);
+    Route::get('/friends/sent', [FriendController::class, 'getSentRequests']);
 });
