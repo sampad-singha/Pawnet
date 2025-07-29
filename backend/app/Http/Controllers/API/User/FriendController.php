@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\API\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Services\User\Interfaces\FriendServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -36,8 +37,16 @@ class FriendController extends Controller
      */
     public function sendFriendRequest(int $friendId): JsonResponse
     {
-        $userId = Auth::user()->id;
-        $friend = $this->friendService->sendFriendRequest($userId, $friendId);
+        $user = Auth::user();
+        $friend = User::find($friendId);
+        //authorization check through policy
+
+        if ($user->cannot('sendFriendRequest', $friend)) {
+            return response()->json([
+                'message' => 'You cannot send a friend request to this user.'
+            ], 403);
+        }
+        $friend = $this->friendService->sendFriendRequest($user->id, $friendId);
 
         if ($friend === null) {
             return response()->json([

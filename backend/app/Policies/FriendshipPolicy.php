@@ -26,8 +26,14 @@ class FriendshipPolicy
 
         // A user cannot send a request to someone they are already friends with
         return !Friend::where(function ($query) use ($user, $friend) {
-            $query->where('user_id', $user->id)
-                ->where('friend_id', $friend->id);
+            $query->where(function($q) use ($user, $friend) {
+                $q->where('user_id', $user->id)
+                    ->where('friend_id', $friend->id);
+            })
+                ->orWhere(function($q) use ($user, $friend) {
+                    $q->where('user_id', $friend->id)
+                        ->where('friend_id', $user->id);
+                });
         })->whereIn('status', ['pending', 'accepted'])->exists();
     }
 
