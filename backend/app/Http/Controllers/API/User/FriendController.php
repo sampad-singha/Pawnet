@@ -4,11 +4,14 @@ namespace App\Http\Controllers\API\User;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\User\Interfaces\FriendServiceInterface;
+use Exception;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
 class FriendController extends Controller
 {
+    use AuthorizesRequests;
     protected FriendServiceInterface $friendService;
 
     public function __construct(FriendServiceInterface $friendService)
@@ -35,26 +38,49 @@ class FriendController extends Controller
      * @param int $friendId
      * @return JsonResponse
      */
-    public function sendFriendRequest(int $friendId): JsonResponse
+    public function sendFriendRequest(int $friendId)
     {
         $user = Auth::user();
         $friend = User::find($friendId);
-        //authorization check through policy
+        $this->authorize('sendFriendRequest', $friend);
 
-        if ($user->cannot('sendFriendRequest', $friend)) {
+        try {
+            $this->friendService->sendFriendRequest($user->id, $friendId);
+
             return response()->json([
-                'message' => 'You cannot send a friend request to this user.'
-            ], 403);
-        }
-        $friend = $this->friendService->sendFriendRequest($user->id, $friendId);
-
-        if ($friend === null) {
+                'message' => 'Friend request sent successfully.',
+            ], 201);
+        } catch (Exception $e) {
             return response()->json([
-                'message' => 'Friend request already sent or users are already friends.'
-            ], 400);
+                'message' => 'Something went wrong.',
+                'error' => $e->getMessage()
+            ], 500);
         }
+    }
 
-        return response()->json($friend, 201);
+    /**
+     * Cancel a pending friend request.
+     *
+     * @param string $friendId
+     * @return JsonResponse
+     */
+    public function cancelFriendRequest(string $friendId)
+    {
+        $user = Auth::user();
+        $friend = User::find($friendId);
+
+        $this->authorize('cancelFriendRequest', $friend);
+        try {
+            $this->friendService->cancelFriendRequest($user->id, $friendId);
+            return response()->json([
+                'message' => 'Friend request cancelled successfully.'
+            ]);
+        } catch (Exception $e) {
+            return  response()->json([
+                'message' => 'Something went wrong.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -65,18 +91,21 @@ class FriendController extends Controller
      */
     public function acceptFriendRequest(int $friendId): JsonResponse
     {
-        $userId = Auth::user()->id;
-        $operation = $this->friendService->acceptFriendRequest($userId, $friendId);
+        $user = Auth::user();
+        $friend = User::find($friendId);
+        $this->authorize('acceptFriendRequest', $friend);
 
-        if (!$operation) {
+        try {
+            $this->friendService->acceptFriendRequest($user->id, $friendId);
             return response()->json([
-                'message' => 'Friend request not found or already accepted.'
-            ], 404);
+                'message' => 'Friend request accepted.'
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Something went wrong.',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        return response()->json([
-            'message' => 'Friend request accepted.'
-        ]);
     }
 
     /**
@@ -88,17 +117,21 @@ class FriendController extends Controller
     public function rejectFriendRequest(int $friendId): JsonResponse
     {
         $userId = Auth::user()->id;
-        $operation = $this->friendService->rejectFriendRequest($userId, $friendId);
+        $friend = User::find($friendId);
+        $this->authorize('rejectFriendRequest', $friend);
 
-        if (!$operation) {
+        try {
+            $this->friendService->rejectFriendRequest($userId, $friendId);
             return response()->json([
-                'message' => 'Friend request not found or already rejected.'
-            ], 404);
+                'message' => 'Friend request rejected.'
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Something went wrong.',
+                'error' => $e->getMessage()
+            ], 500);
         }
 
-        return response()->json([
-            'message' => 'Friend request rejected.'
-        ]);
     }
 
     /**
@@ -110,17 +143,21 @@ class FriendController extends Controller
     public function deleteFriend(int $friendId): JsonResponse
     {
         $userId = Auth::user()->id;
-        $operation = $this->friendService->unFriend($userId, $friendId);
+        $friend = User::find($friendId);
+        $this->authorize('unFriend', $friend);
 
-        if (!$operation) {
+        try {
+            $this->friendService->unFriend($userId, $friendId);
+
             return response()->json([
-                'message' => 'Friendship not found or already deleted.'
-            ], 404);
+                'message' => 'Friendship deleted successfully.'
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Something went wrong.',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        return response()->json([
-            'message' => 'Friendship deleted successfully.'
-        ]);
     }
 
     /**
@@ -147,10 +184,5 @@ class FriendController extends Controller
         $sentRequests = $this->friendService->getSentRequests($userId);
 
         return response()->json($sentRequests);
-    }
-
-    public function cancelFriendRequest(string $friendId)
-    {
-
     }
 }

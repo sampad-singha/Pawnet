@@ -3,14 +3,16 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-
+/** @mixin Builder */
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, HasApiTokens;
 
     /**
@@ -81,21 +83,15 @@ class User extends Authenticatable
 //            ->withTimestamps()
 //            ->get();
 //    }
-    public function pendingSentRequests()
-    {
-        return $this->hasMany(Friend::class, 'user_id')
-            ->where('status', 'pending');
-    }
-    public function pendingReceivedRequests()
-    {
-        return $this->hasMany(Friend::class, 'friend_id')
-            ->where('status', 'pending');
-    }
-    public function blockedUsers()
-    {
-        return $this->belongsToMany(User::class, 'friends', 'user_id', 'friend_id')
-            ->wherePivot('status', 'blocked')
-            ->withTimestamps();
-    }
+//    public function pendingSentRequests()
+//    {
+//        return $this->hasMany(Friend::class, 'user_id')
+//            ->where('status', 'pending');
+//    }
+//    public function pendingReceivedRequests()
+//    {
+//        return $this->hasMany(Friend::class, 'friend_id')
+//            ->where('status', 'pending');
+//    }
 
 }

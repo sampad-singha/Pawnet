@@ -42,7 +42,7 @@ class FriendRepository implements FriendRepositoryInterface
         ]);
     }
 
-    public function getFriendsByStatus(int $userId, string $status): \Illuminate\Database\Eloquent\Collection
+    public function getFriendsByStatus(int $userId, string $status): Collection
     {
         if ($status == 'sent') {
             return Friend::where('user_id', $userId)

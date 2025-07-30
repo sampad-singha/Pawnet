@@ -2,12 +2,18 @@
 
 namespace App\Models;
 
+use Database\Factories\FriendFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+
+/** @mixin Builder */
 class Friend extends Model
 {
-    /** @use HasFactory<\Database\Factories\FriendFactory> */
+    /** @use HasFactory<FriendFactory> */
+
     use HasFactory;
 
     protected $fillable = [
@@ -17,7 +23,7 @@ class Friend extends Model
     /**
      * Get the user associated with the friend record.
      */
-    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
@@ -25,7 +31,7 @@ class Friend extends Model
     /**
      * Get the friend associated with the friend record.
      */
-    public function friend(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function friend(): BelongsTo
     {
         return $this->belongsTo(User::class, 'friend_id');
     }

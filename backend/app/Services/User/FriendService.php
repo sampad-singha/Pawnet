@@ -30,44 +30,22 @@ class FriendService implements FriendServiceInterface
     }
     public function sendFriendRequest(int $userId, int $friendId): ?Friend
     {
-        // Check if any relationship already exists (pending, accepted, or blocked)
-        if ($this->friendRepository->doesFriendshipExist($userId, $friendId)) {
-            return null; // Relationship already exists in any form (pending, accepted)
-        }
-        if ($userId === $friendId)
-        {
-            return null; // Cannot send a friend request to oneself
-        }
-
         // Otherwise, create the friendship (pending status)
         return $this->friendRepository->createFriendship($userId, $friendId);
     }
 
     public function cancelFriendRequest(int $userId, int $friendId): bool
     {
-        $status = $this->friendRepository->getStatus($userId, $friendId);
-        if ($status === 'pending') {
-            return $this->friendRepository->deleteFriend($userId, $friendId);
-        }
-        return false; // Cannot cancel if the status is not pending
+        return $this->friendRepository->deleteFriend($userId, $friendId);
     }
 
     public function acceptFriendRequest(int $userId, int $friendId): bool
     {
-        $status = $this->friendRepository->getStatus($friendId , $userId);
-        if ($status === 'pending') {
-            return $this->friendRepository->updateStatus($userId, $friendId, 'accepted');
-        }
-        return false; // Cannot accept if the status is not pending
+        return $this->friendRepository->updateStatus($userId, $friendId, 'accepted');
     }
     public function rejectFriendRequest(int $userId, int $friendId): bool
     {
-        $status = $this->friendRepository->getStatus($friendId , $userId);
-        if ($status === 'pending') {
-            return $this->friendRepository->deleteFriend($userId, $friendId);
-            //Follower logic later
-        }
-        return false; // Cannot reject if the status is not pending
+        return $this->friendRepository->deleteFriend($userId, $friendId);
     }
 
     public function unFriend(int $userId, int $friendId): bool
