@@ -1,21 +1,25 @@
 import React, { useState } from 'react';
 import { Button, Container, Box, Typography, Input, FormControl, FormLabel, Link } from '@mui/joy';
 import api from "../Api.jsx"; // Import the API service
-import {Facebook as FacebookIcon } from '@mui/icons-material';
 import GoogleLogin from "../components/GoogleLogin.jsx";
 import FacebookLogin from "../components/FacebookLogin.jsx";
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const navigate = useNavigate(); // Initialize useNavigate hook
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        // Clear previous error if any
+        setError('');
+
         try {
             // Make the POST request to the /login endpoint
-            const response = await api.post('login', {
+            const response = await api.post('/login', {
                 email,
                 password
             });
@@ -26,11 +30,28 @@ const Login = () => {
             // Store the token in localStorage or sessionStorage for further requests
             localStorage.setItem('authToken', token);
 
-            // Redirect the user to the dashboard or the protected page
-            window.location = '/dashboard';  // Replace with the correct route
+            // Redirect the user to the dashboard or protected page using useNavigate
+            navigate('/dashboard');  // This will trigger client-side navigation without reloading the page
         } catch (err) {
             console.error('Login error:', err);
-            setError('Invalid credentials, please try again.');
+
+            // Handle different types of error responses from the API
+            if (err.response) {
+                // Error response from the server (e.g., invalid credentials, etc.)
+                if (err.response.status === 401) {
+                    setError('Invalid email or password. Please try again.');
+                } else if (err.response.status === 500) {
+                    setError('Server error. Please try again later.');
+                } else {
+                    setError('Something went wrong. Please try again.');
+                }
+            } else if (err.request) {
+                // The request was made, but no response was received (network error)
+                setError('Network error. Please check your internet connection and try again.');
+            } else {
+                // Other unexpected errors
+                setError('An unexpected error occurred. Please try again.');
+            }
         }
     };
 
@@ -80,6 +101,12 @@ const Login = () => {
                             sx={{ width: '100%' }} // Ensure full width styling
                         />
                     </FormControl>
+
+                    {error && (
+                        <Typography color="error" align="center" marginTop={2}>
+                            {error}
+                        </Typography>
+                    )}
 
                     <Button
                         type="submit"
