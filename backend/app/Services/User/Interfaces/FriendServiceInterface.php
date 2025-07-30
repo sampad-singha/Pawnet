@@ -24,6 +24,14 @@ interface FriendServiceInterface
     public function sendFriendRequest(int $userId, int $friendId): ?Friend;
 
     /**
+     * Cancel a friend request.
+     *
+     * @param int $userId
+     * @param int $friendId
+     * @return bool
+     */
+    public function cancelFriendRequest(int $userId, int $friendId): bool;
+    /**
      * Accept a friend request.
      *
      * @param int $userId

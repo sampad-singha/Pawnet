@@ -35,12 +35,13 @@ Route::prefix('auth/facebook')->group(function () {
     Route::get('/callback', [FacebookAuthController::class, 'callback']);
 });
 
-Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/friends', [FriendController::class, 'getFriends']);
-    Route::post('/friend-request/{friendId}', [FriendController::class, 'sendFriendRequest']);
+Route::middleware('auth:sanctum')->prefix('/friends')->group(function () {
+    Route::get('/', [FriendController::class, 'getFriends']);
+    Route::post('/send-request/{friendId}', [FriendController::class, 'sendFriendRequest']);
+    Route::post('/cancel-request/{friendId}', [FriendController::class, 'cancelFriendRequest']);
     Route::post('/accept-request/{friendId}', [FriendController::class, 'acceptFriendRequest']);
     Route::post('/reject-request/{friendId}', [FriendController::class, 'rejectFriendRequest']);
     Route::post('/unfriend/{friendId}', [FriendController::class, 'deleteFriend']);
-    Route::get('/friends/pending', [FriendController::class, 'getPendingRequests']);
-    Route::get('/friends/sent', [FriendController::class, 'getSentRequests']);
+    Route::get('/request/pending', [FriendController::class, 'getPendingRequests']);
+    Route::get('/request/sent', [FriendController::class, 'getSentRequests']);
 });

@@ -43,6 +43,15 @@ class FriendService implements FriendServiceInterface
         return $this->friendRepository->createFriendship($userId, $friendId);
     }
 
+    public function cancelFriendRequest(int $userId, int $friendId): bool
+    {
+        $status = $this->friendRepository->getStatus($userId, $friendId);
+        if ($status === 'pending') {
+            return $this->friendRepository->deleteFriend($userId, $friendId);
+        }
+        return false; // Cannot cancel if the status is not pending
+    }
+
     public function acceptFriendRequest(int $userId, int $friendId): bool
     {
         $status = $this->friendRepository->getStatus($friendId , $userId);

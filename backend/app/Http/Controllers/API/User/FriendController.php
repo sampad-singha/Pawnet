@@ -148,4 +148,9 @@ class FriendController extends Controller
 
         return response()->json($sentRequests);
     }
+
+    public function cancelFriendRequest(string $friendId)
+    {
+
+    }
 }
