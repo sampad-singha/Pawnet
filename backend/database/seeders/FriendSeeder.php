@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Friend;
 use App\Models\User;
+use App\Models\UserProfile;
 use Illuminate\Database\Seeder;
 
 class FriendSeeder extends Seeder
@@ -14,7 +15,7 @@ class FriendSeeder extends Seeder
     public function run(): void
     {
         // Create a User A (main user)
-        $userA = User::factory()->create([
+        $userA = User::factory()->has(UserProfile::factory())->create([
             'name' => 'User A',
             'email' => 'userA@example.com',
         ]);
