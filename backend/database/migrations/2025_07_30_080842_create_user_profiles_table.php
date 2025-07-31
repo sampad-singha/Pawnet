@@ -17,6 +17,7 @@ return new class extends Migration
             $table->date('date_of_birth');
             $table->enum('gender', ['male', 'female', 'other'])->nullable();
             $table->string('phone_number');
+            $table->boolean('phone_verified')->default(false);
             $table->string('address')->nullable();
             $table->string('city')->nullable();
             $table->string('state')->nullable();

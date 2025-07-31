@@ -24,6 +24,7 @@ class UserProfileFactory extends Factory
             'date_of_birth' => $this->faker->date(),
             'gender' => $this->faker->randomElement(['male','female','other']),
             'phone_number' => $this->faker->phoneNumber,
+            'phone_verified' => $this->faker->boolean(20), // 20% chance of being true
             'address' => $this->faker->address,
             'city' => $this->faker->city,
             'state' => $this->faker->state,

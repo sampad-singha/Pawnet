@@ -21,6 +21,7 @@ class UserProfile extends Model
         'date_of_birth',
         'gender',
         'phone_number',
+        'phone_verified',
         'address',
         'city',
         'state',
