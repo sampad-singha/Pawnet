@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Friend;
 use App\Models\User;
+use App\Models\UserProfile;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -22,8 +23,8 @@ class FriendFactory extends Factory
         $status = $this->faker->randomElement(['pending', 'accepted']);
 
         return [
-            'user_id' => User::factory(),
-            'friend_id' => User::factory(),
+            'user_id' => User::factory()->has(UserProfile::factory()),
+            'friend_id' => User::factory()->has(userprofile::factory()),
             'status' => $status,
             'created_at' => now(),
         ];

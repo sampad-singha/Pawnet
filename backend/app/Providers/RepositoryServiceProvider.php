@@ -5,7 +5,9 @@ namespace App\Providers;
 
 use App\Repositories\FriendRepository;
 use App\Repositories\Interfaces\FriendRepositoryInterface;
+use App\Repositories\Interfaces\UserProfileRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
+use App\Repositories\UserProfileRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Support\ServiceProvider;
 
@@ -22,6 +24,11 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             FriendRepositoryInterface::class,
             FriendRepository::class
+        );
+
+        $this->app->bind(
+            UserProfileRepositoryInterface::class,
+            UserProfileRepository::class
         );
     }
 }
