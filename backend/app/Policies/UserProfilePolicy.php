@@ -19,9 +19,29 @@ class UserProfilePolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, UserProfile $userProfile): bool
+    public function viewOwnProfile(User $user, UserProfile $userProfile): Response
     {
-        return false;
+        if( $user->id !== $userProfile->user_id) {
+            return Response::deny('This profile does not belong to you.'); // User can view their own profile
+        }
+        return Response::allow(); // Allow viewing if the user owns the profile
+    }
+
+    public function viewUserProfile(User $user, UserProfile $userProfile): Response
+    {
+        // Will add logic to check if user is blocked
+
+
+        // Allow viewing if the user owns the profile or if the profile is public
+        if ($user->id === $userProfile->user_id || $userProfile->visibility === 'public') {
+            return Response::allow();
+        }
+        $friend = User::find($userProfile->user_id);
+        // allow for friends
+        if ($user->isFriendsWith($friend)) {
+            return Response::allow();
+        }
+        return Response::deny('You do not have permission to view this profile.');
     }
 
     /**
@@ -32,7 +52,7 @@ class UserProfilePolicy
         // check if user already has a profile
         $hasProfile = UserProfile::where('user_id', $user->id)->exists();
         if ($hasProfile) {
-            return Response::deny('You already have a profile.');
+            return Response::deny('You already created your profile.');
         } else {
             // allow creation if no profile exists
             return Response::allow();
