@@ -32,4 +32,9 @@ interface UserProfileServiceInterface
      * @return UserProfile
      */
     public function updateVisibility(User $user, string $visibility): UserProfile;
+
+
+    public function sendPhoneNumberVerificationCode(UserProfile $profile,string $phoneNumber): bool;
+
+    public function verifyPhoneNumber(User $user,string $phoneNumber, int $code): bool;
 }

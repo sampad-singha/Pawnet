@@ -30,6 +30,12 @@ class UserProfileRepository Implements UserProfileRepositoryInterface
     {
         //find the user profile by user ID and update it with the given data
         $profile = UserProfile::findOrFail($id);
+
+        //check if phone_number will be updated
+        if (isset($data['phone_number']) && $data['phone_number'] !== $profile->phone_number) {
+            $data['phone_verified'] = false;
+        }
+
         $profile->update($data);
 
         return $profile->fresh();
@@ -39,7 +45,7 @@ class UserProfileRepository Implements UserProfileRepositoryInterface
     {
         //find the user profile by user ID and update its phone number status
         $profile = UserProfile::findOrFail($id);
-        $profile->phone_number_verified = $status;
+        $profile->phone_verified = $status;
 
         return $profile->save();
     }

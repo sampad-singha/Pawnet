@@ -128,4 +128,44 @@ class UserProfileController extends Controller
             ], 500);
         }
     }
+
+    public function sendPhoneVerificationCode()
+    {
+        $user = Auth::user();
+        $profile = $user->userProfile()->first();
+        $phoneNumber = $profile->phone_number;
+        $this->authorize('updateUserProfile', $profile);
+        try {
+            $this->userProfileService->sendPhoneNumberVerificationCode($profile, $phoneNumber);
+            return response()->json([
+                'message' => 'Phone verification code sent successfully',
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'error' => 'Failed to send phone verification code.',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function verifyPhoneNumber(Request $request)
+    {
+        $user = Auth::user();
+        $profile = $user->userProfile()->first();
+        $phone_number = $profile->phone_number;
+        //validate request data
+        $request->validate([
+            'code' => 'required|integer',
+        ]);
+        $this->authorize('updateUserProfile', $profile);
+        try {
+            $this->userProfileService->verifyPhoneNumber($user, $phone_number, $request->code);
+            return response()->json(['message' => 'Phone number verified successfully']);
+        } catch (Exception $e) {
+            return response()->json([
+                'error' => 'Failed to verify phone number: ',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

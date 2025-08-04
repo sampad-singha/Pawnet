@@ -1,10 +1,13 @@
 <?php
+
 namespace App\Services\User;
 
 use App\Models\User;
 use App\Models\UserProfile;
 use App\Repositories\Interfaces\UserProfileRepositoryInterface;
 use App\Services\User\Interfaces\UserProfileServiceInterface;
+use Exception;
+use Twilio\Rest\Client;
 
 
 class UserProfileService implements UserProfileServiceInterface
@@ -15,6 +18,7 @@ class UserProfileService implements UserProfileServiceInterface
     {
         $this->userProfileRepository = $userProfileRepository;
     }
+
     /**
      * Get the user profile by user ID.
      *
@@ -51,15 +55,87 @@ class UserProfileService implements UserProfileServiceInterface
      * @param User $user
      * @param string $visibility
      * @return UserProfile
+     * @throws Exception
      */
     public function updateVisibility(User $user, string $visibility): UserProfile
     {
-        $profile = $this->getUserProfile($user->id);
-        if ($profile) {
-            $profile['visibility'] = $visibility;
-            $profile->save();
+        try {
+            $profile = $this->getUserProfile($user->id);
+            $id = $profile?->id;
+            $this->userProfileRepository->updateVisibility($id, $visibility);
+
+            return $profile;
+        } catch (Exception $e) {
+            throw new Exception('Failed to update visibility: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function sendPhoneNumberVerificationCode(UserProfile $profile,string $phoneNumber): bool
+    {
+        if ($profile->phone_verified) {
+            throw  new Exception('Phone number already verified');
+        }
+        $token = getenv("TWILIO_AUTH_TOKEN");
+        $twilio_sid = getenv("TWILIO_SID");
+        $twilio_verify_sid = getenv("TWILIO_VERIFY_SID");
+
+        if (empty($token) || empty($twilio_sid) || empty($twilio_verify_sid)) {
+            throw new Exception('Twilio credentials are not set in the environment variables.', 404);
         }
 
-        return $profile;
+        try {
+
+            $twilio = new Client($twilio_sid, $token);
+
+            $twilio->verify->v2->services($twilio_verify_sid)
+                ->verifications
+                ->create($phoneNumber, "sms");
+
+            return true;
+        } catch (Exception $e) {
+            throw new Exception('Failed to verify phone number: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function verifyPhoneNumber(User $user,string $phoneNumber, int $code): bool
+    {
+        $token = getenv("TWILIO_AUTH_TOKEN");
+        $twilio_sid = getenv("TWILIO_SID");
+        $twilio_verify_sid = getenv("TWILIO_VERIFY_SID");
+
+        if (empty($token) || empty($twilio_sid) || empty($twilio_verify_sid)) {
+            throw new Exception('Twilio credentials are not set in the environment variables.', 404);
+        }
+
+        try {
+            $twilio = new Client($twilio_sid, $token);
+
+            $verification = $twilio->verify->v2->services($twilio_verify_sid)
+                ->verificationChecks
+                ->create([
+                    'to' => $phoneNumber,
+                    'code' => $code,
+                ]);
+
+            if ($verification->valid) {
+                $profile = $this->getUserProfile($user->id);
+                if (!$profile) {
+                    throw new Exception('User profile not found.', 404);
+                }
+
+                $this->userProfileRepository->updatePhoneNumberStatus($profile->id, true);
+                return true;
+            } else {
+                throw new Exception('Invalid verification code.', 400);
+            }
+        } catch (Exception $e) {
+            throw new Exception('Failed to verify phone number: ' . $e->getMessage());
+        }
     }
 }
