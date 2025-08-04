@@ -19,28 +19,6 @@ class UserProfileController extends Controller
     {
         $this->userProfileService = $userProfileService;
     }
-    /**
-     * Display the user profile.
-     *
-     * @return JsonResponse
-     */
-    public function show()
-    {
-        $user = Auth::user();
-        $userProfile = $user->userProfile()->first();
-        $this->authorize('viewOwnProfile', $userProfile);
-
-        try {
-            return response()->json([
-                'userProfile' => $userProfile
-            ]);
-        } catch (Exception $exception) {
-            return response()->json([
-                'error' => 'Failed to retrieve user profile',
-                'message' => $exception->getMessage()
-            ], 500);
-        }
-    }
 
     /**
      * Display the user profile by user ID.
@@ -48,9 +26,8 @@ class UserProfileController extends Controller
      * @param int $profileId
      * @return JsonResponse
      */
-    public function showOther(int $profileId)
+    public function show(int $profileId)
     {
-        $userId = Auth::id();
         $userProfile = $this->userProfileService->getUserProfile($profileId);
         $this->authorize('viewUserProfile', $userProfile);
 

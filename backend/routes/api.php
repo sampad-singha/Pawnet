@@ -48,8 +48,8 @@ Route::middleware('auth:sanctum')->prefix('/friends')->group(function () {
 });
 
 Route::middleware('auth:sanctum')->prefix('/users')->group(function () {
-    Route::get('/profile', [UserProfileController::class, 'show']);
-    Route::get('/profile/{profileId}', [UserProfileController::class, 'showOther']);
+//    Route::get('/profile', [UserProfileController::class, 'show']);
+    Route::get('/profile/{profileId}', [UserProfileController::class, 'show']);
     Route::post('/profile/create', [UserProfileController::class, 'create']);
     Route::post('/profile/update', [UserProfileController::class, 'update']);
     Route::post('/profile/visibility', [UserProfileController::class, 'changeVisibility']);

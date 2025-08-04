@@ -19,13 +19,6 @@ class UserProfilePolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function viewOwnProfile(User $user, UserProfile $userProfile): Response
-    {
-        if( $user->id !== $userProfile->user_id) {
-            return Response::deny('This profile does not belong to you.'); // User can view their own profile
-        }
-        return Response::allow(); // Allow viewing if the user owns the profile
-    }
 
     public function viewUserProfile(User $user, UserProfile $userProfile): Response
     {
