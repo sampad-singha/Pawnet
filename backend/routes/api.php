@@ -4,6 +4,7 @@ use App\Http\Controllers\API\Auth\AuthController;
 use App\Http\Controllers\API\Auth\FacebookAuthController;
 use App\Http\Controllers\API\Auth\GoogleAuthController;
 use App\Http\Controllers\API\User\FriendController;
+use App\Http\Controllers\API\User\UserProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -44,4 +45,14 @@ Route::middleware('auth:sanctum')->prefix('/friends')->group(function () {
     Route::post('/unfriend/{friendId}', [FriendController::class, 'deleteFriend']);
     Route::get('/request/pending', [FriendController::class, 'getPendingRequests']);
     Route::get('/request/sent', [FriendController::class, 'getSentRequests']);
+});
+
+Route::middleware('auth:sanctum')->prefix('/users')->group(function () {
+//    Route::get('/profile', [UserProfileController::class, 'show']);
+    Route::get('/profile/{profileId}', [UserProfileController::class, 'show']);
+    Route::post('/profile/create', [UserProfileController::class, 'create']);
+    Route::post('/profile/update', [UserProfileController::class, 'update']);
+    Route::post('/profile/visibility', [UserProfileController::class, 'changeVisibility']);
+    Route::post('/profile/phone-number/verify', [UserProfileController::class, 'sendPhoneVerificationCode']);
+    Route::post('/profile/phone-number/verify-code', [UserProfileController::class, 'verifyPhoneNumber']);
 });

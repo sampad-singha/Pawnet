@@ -6,6 +6,7 @@ namespace App\Models;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -70,6 +71,28 @@ class User extends Authenticatable
 
         // Merge the two relationships and remove duplicates (based on user id)
         return $friendsInitiated->union($friendsReceived)->distinct()->get();
+    }
+    public function isFriendsWith(User $otherUser): bool
+    {
+        // Check the 'friends' table directly for an accepted relationship in either direction
+        return \Illuminate\Support\Facades\DB::table('friends')
+            ->where('status', 'accepted')
+            ->where(function ($query) use ($otherUser) {
+                $query->where('user_id', $this->id)
+                    ->where('friend_id', $otherUser->id);
+            })
+            ->orWhere(function ($query) use ($otherUser) {
+                $query->where('user_id', $otherUser->id)
+                    ->where('friend_id', $this->id);
+            })
+            ->exists();
+    }
+
+
+
+    public function userProfile(): HasOne
+    {
+        return $this->hasOne(UserProfile::class);
     }
 
 
