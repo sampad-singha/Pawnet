@@ -2,6 +2,7 @@
 
 namespace App\Services\User;
 
+use App\Models\Util\City;
 use App\Models\Util\Country;
 use App\Models\Util\Region;
 use App\Models\Util\State;
@@ -80,5 +81,73 @@ class LocationService implements LocationServiceInterface
             throw new Exception("Country not found");
         }
         return $country->cities;
+    }
+
+    //get all countries
+    public function getAllCountries(): Collection
+    {
+        return Country::all();
+    }
+
+    //get each by id
+
+    /**
+     * @throws Exception
+     */
+    public function getRegionById(int $regionId): Region
+    {
+        $region =  Region::find($regionId);
+        if (!$region) {
+            throw new Exception("Region not found");
+        }
+        return $region;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function getSubregionById(int $subregionId): Subregion
+    {
+        $subregion = Subregion::find($subregionId);
+        if (!$subregion) {
+            throw new Exception("Subregion not found");
+        }
+        return $subregion;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function getCountryById(int $countryId): Country
+    {
+        $country = Country::find($countryId);
+        if (!$country) {
+            throw new Exception("Country not found");
+        }
+        return $country;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function getStateById(int $stateId): State
+    {
+        $state = State::find($stateId);
+        if (!$state) {
+            throw new Exception("State not found");
+        }
+        return $state;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function getCityById(int $cityId): City
+    {
+        $city = City::find($cityId);
+        if (!$city) {
+            throw new Exception("City not found");
+        }
+        return $city;
     }
 }

@@ -45,6 +45,16 @@ class Country extends Model
         'flag' => 'boolean',
     ];
 
+    /**
+     * Get the phone code with a + sign whenever accessed.
+     *
+     * @return string
+     */
+    public function getWithPlus(): string
+    {
+        return '+' . $this->phone_code;
+    }
+
     public function region(): BelongsTo
     {
         return $this->belongsTo(Region::class, 'region_id');

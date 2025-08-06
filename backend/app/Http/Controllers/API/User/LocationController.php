@@ -128,4 +128,117 @@ class LocationController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Get all countries.
+     *
+     * @return JsonResponse
+     */
+    public function getAllCountries()
+    {
+        try {
+            $countries = $this->locationService->getAllCountries();
+            return response()->json($countries);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Something went wrong while fetching all countries.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get a region by its ID.
+     *
+     * @param int $regionId
+     * @return JsonResponse
+     */
+    public function getRegionById(int $regionId)
+    {
+        try {
+            $region = $this->locationService->getRegionById($regionId);
+            return response()->json($region);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Something went wrong while fetching the region.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get a subregion by its ID.
+     *
+     * @param int $subregionId
+     * @return JsonResponse
+     */
+    public function getSubregionById(int $subregionId)
+    {
+        try {
+            $subregion = $this->locationService->getSubregionById($subregionId);
+            return response()->json($subregion);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Something went wrong while fetching the subregion.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get a country by its ID.
+     *
+     * @param int $countryId
+     * @return JsonResponse
+     */
+    public function getCountryById(int $countryId)
+    {
+        try {
+            $country = $this->locationService->getCountryById($countryId);
+            return response()->json($country);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Something went wrong while fetching the country.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get a state by its ID.
+     *
+     * @param int $stateId
+     * @return JsonResponse
+     */
+    public function getStateById(int $stateId)
+    {
+        try {
+            $state = $this->locationService->getStateById($stateId);
+            return response()->json($state);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Something went wrong while fetching the state.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get a city by its ID.
+     *
+     * @param int $cityId
+     * @return JsonResponse
+     */
+    public function getCityById(int $cityId)
+    {
+        try {
+            $city = $this->locationService->getCityById($cityId);
+            return response()->json($city);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Something went wrong while fetching the city.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
