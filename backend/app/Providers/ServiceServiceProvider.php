@@ -9,7 +9,9 @@ use App\Services\Auth\Interfaces\AuthServiceInterface;
 use App\Services\Auth\Interfaces\GoogleAuthServiceInterface;
 use App\Services\User\FriendService;
 use App\Services\User\Interfaces\FriendServiceInterface;
+use App\Services\User\Interfaces\LocationServiceInterface;
 use App\Services\User\Interfaces\UserProfileServiceInterface;
+use App\Services\User\LocationService;
 use App\Services\User\UserProfileService;
 use Illuminate\Support\ServiceProvider;
 
@@ -33,6 +35,10 @@ class ServiceServiceProvider extends ServiceProvider
         $this->app->bind(
             UserProfileServiceInterface::class,
             UserProfileService::class
+        );
+        $this->app->bind(
+            LocationServiceInterface::class,
+            LocationService::class
         );
 
     }
