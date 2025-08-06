@@ -3,8 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\UserProfile;
 use Illuminate\Database\Seeder;
 
@@ -15,7 +13,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
 
         User::factory()->has(UserProfile::factory())->create([
             'name' => 'Test User',
@@ -24,5 +21,10 @@ class DatabaseSeeder extends Seeder
 
         $this->call(FriendSeeder::class);
 
+        $this->call(RegionsTableSeeder::class);
+        $this->call(SubregionsTableSeeder::class);
+        $this->call(CountriesTableSeeder::class);
+        $this->call(StatesTableSeeder::class);
+        $this->call(CitiesTableSeeder::class);
     }
 }
