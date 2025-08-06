@@ -109,6 +109,8 @@ class UserProfileService implements UserProfileServiceInterface
         }
 
         try {
+            // Add + . Country Code . phone number
+            // Will do later
 
             $twilio = new Client($twilio_sid, $token);
 

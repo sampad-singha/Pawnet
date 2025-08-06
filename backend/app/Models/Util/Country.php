@@ -46,7 +46,7 @@ class Country extends Model
     ];
 
     /**
-     * Get the phone code with a + sign whenever accessed.
+     * Get the phone code with a + sign.
      *
      * @return string
      */
