@@ -1,58 +1,35 @@
 <?php
 
-use App\Http\Controllers\API\Auth\AuthController;
-use App\Http\Controllers\API\Auth\FacebookAuthController;
-use App\Http\Controllers\API\Auth\GoogleAuthController;
-use App\Http\Controllers\API\User\FriendController;
-use App\Http\Controllers\API\User\UserProfileController;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
+// User Authentication Routes
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+use App\Http\Controllers\API\User\LocationController;
 
-Route::post('/register', [AuthController::class, 'register']);
-//Route::post('/login', [AuthController::class, 'login']);
-Route::middleware('throttle:5,1')->post('/login', [AuthController::class, 'login']);
+require base_path('routes/Api/user_auth.php');
+
+// User Relation Routes
+require base_path('routes/Api/user_relation.php');
+
+// Profile Routes
+require  base_path('routes/Api/profile.php');
+
+
+//Location Routes
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/user/verify-token', [AuthController::class, 'verifyToken']);
-    Route::post('/user/set-password', [AuthController::class, 'setPassword']);
-    Route::post('/user/change-password', [AuthController::class, 'changePassword']);
-    Route::post('/refresh-token', [AuthController::class, 'refreshToken']);
-    Route::post('/logout', [AuthController::class, 'logout']);
-    Route::post('/logout-all', [AuthController::class, 'logoutAll']);
-});
-Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
-Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.reset');
+    Route::get('location/regions', [LocationController::class, 'getRegions']);
+    Route::get('location/regions/{regionId}', [LocationController::class, 'getRegionById']);
 
-//Google Authentication Routes
-Route::prefix('auth/google')->group(function () {
-    Route::get('/redirect', [GoogleAuthController::class, 'redirect']);
-    Route::get('/callback', [GoogleAuthController::class, 'callback']);
-});
-Route::prefix('auth/facebook')->group(function () {
-    Route::get('/redirect', [FacebookAuthController::class, 'redirect']);
-    Route::get('/callback', [FacebookAuthController::class, 'callback']);
-});
+    Route::get('location/regions/{regionId}/subregions', [LocationController::class, 'getSubregions']);
+    Route::get('location/regions/subregions/{subregionId}', [LocationController::class, 'getSubregionById']);
 
-Route::middleware('auth:sanctum')->prefix('/friends')->group(function () {
-    Route::get('/', [FriendController::class, 'getFriends']);
-    Route::post('/send-request/{friendId}', [FriendController::class, 'sendFriendRequest']);
-    Route::post('/cancel-request/{friendId}', [FriendController::class, 'cancelFriendRequest']);
-    Route::post('/accept-request/{friendId}', [FriendController::class, 'acceptFriendRequest']);
-    Route::post('/reject-request/{friendId}', [FriendController::class, 'rejectFriendRequest']);
-    Route::post('/unfriend/{friendId}', [FriendController::class, 'deleteFriend']);
-    Route::get('/request/pending', [FriendController::class, 'getPendingRequests']);
-    Route::get('/request/sent', [FriendController::class, 'getSentRequests']);
-});
+    Route::get('location/subregions/{subregionId}/countries', [LocationController::class, 'getCountries']);
+    Route::get('location/subregions/countries/{countryId}', [LocationController::class, 'getCountryById']);
 
-Route::middleware('auth:sanctum')->prefix('/users')->group(function () {
-//    Route::get('/profile', [UserProfileController::class, 'show']);
-    Route::get('/profile/{profileId}', [UserProfileController::class, 'show']);
-    Route::post('/profile/create', [UserProfileController::class, 'create']);
-    Route::post('/profile/update', [UserProfileController::class, 'update']);
-    Route::post('/profile/visibility', [UserProfileController::class, 'changeVisibility']);
-    Route::post('/profile/phone-number/verify', [UserProfileController::class, 'sendPhoneVerificationCode']);
-    Route::post('/profile/phone-number/verify-code', [UserProfileController::class, 'verifyPhoneNumber']);
+    Route::get('location/countries/{countryId}/states', [LocationController::class, 'getStates']);
+    Route::get('location/countries/states/{stateId}', [LocationController::class, 'getStateById']);
+
+    Route::get('location/states/{stateId}/cities', [LocationController::class, 'getCities']);
+    Route::get('location/states/cities/{cityId}', [LocationController::class, 'getCityById']);
+
+    Route::get('location/countries/{countryId}/cities', [LocationController::class, 'getCitiesByCountry']);
+    Route::get('location/countries', [LocationController::class, 'getAllCountries']);
 });
