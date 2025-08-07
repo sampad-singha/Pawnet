@@ -17,13 +17,13 @@ class UserProfileRepository Implements UserProfileRepositoryInterface
             'gender' => $data['gender'] ?? null,
             'phone_number' => $data['phone_number'] ?? '',
             'address' => $data['address'] ?? '',
-            'city' => $data['city'] ?? '',
-            'state' => $data['state'] ?? '',
-            'country' => $data['country'] ?? '',
+            'city_id' => $data['city_id'] ?? '',
+            'state_id' => $data['state_id'] ?? '',
+            'country_id' => $data['country_id'] ?? '',
             'visibility' => $data['visibility'] ?? 'public',
         ]);
-
         $profile->save();
+
         return $profile;
     }
     public function update(int $id, array $data): UserProfile

@@ -12,7 +12,8 @@
         "laravel/sanctum": "^4.0",
         "laravel/socialite": "^5.22",
         "laravel/tinker": "^2.9",
-        "rinvex/countries": "^9.1",
+        "orangehill/iseed": "^3.1",
+        "propaganistas/laravel-phone": "^6.0",
         "twilio/sdk": "^8.7"
     },
     "require-dev": {

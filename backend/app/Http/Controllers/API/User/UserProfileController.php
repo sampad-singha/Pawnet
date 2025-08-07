@@ -50,19 +50,20 @@ class UserProfileController extends Controller
     {
         $user = Auth::user();
         //validate request data
-        $request->validate([
+        $data = $request->validate([
             'date_of_birth' => 'nullable|date',
             'bio' => 'nullable|string|max:1000',
             'gender' => 'nullable|in:male,female,other',
-            'mobile' => 'nullable|string|max:15',
+            'phone_number' => 'nullable|string|max:15',
+            'country_iso2' => 'string|max:2',
             'address' => 'nullable|string|max:255',
-            'city' => 'nullable|string|max:255',
-            'state' => 'nullable|string|max:255',
-            'country' => 'nullable|string|max:255',
+            'city_id' => 'nullable|string|max:255',
+            'state_id' => 'nullable|string|max:255',
+            'country_id' => 'string|max:255',
         ]);
         $this->authorize('createUserProfile', $user);
         try {
-            $this->userProfileService->createOrUpdateGeneralInfo($user, $request->all());
+            $this->userProfileService->createOrUpdateGeneralInfo($user, $data);
             return response()->json(['message' => 'User profile created successfully']);
         } catch (Exception $e) {
             return response()->json([
@@ -85,11 +86,12 @@ class UserProfileController extends Controller
         $request->validate([
             'date_of_birth' => 'nullable|date',
             'bio' => 'nullable|string|max:1000',
-            'mobile' => 'nullable|string|max:15',
+            'phone_number' => 'nullable|string|max:15',
+            'country_iso2' => 'string|max:2',
             'address' => 'nullable|string|max:255',
-            'city' => 'nullable|string|max:255',
-            'state' => 'nullable|string|max:255',
-            'country' => 'nullable|string|max:255',
+            'city_id' => 'nullable|string|max:255',
+            'state_id' => 'nullable|string|max:255',
+            'country_id' => 'string|max:255',
         ]);
         $this->authorize('updateUserProfile', $profile);
         try {
