@@ -19,9 +19,12 @@ return new class extends Migration
             $table->string('phone_number');
             $table->boolean('phone_verified')->default(false);
             $table->string('address')->nullable();
-            $table->string('city')->nullable();
-            $table->string('state')->nullable();
-            $table->string('country')->nullable();
+//            $table->string('city')->nullable();
+//            $table->string('state')->nullable();
+//            $table->string('country')->nullable();
+            $table->foreignId('city_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('state_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('country_id')->nullable()->constrained()->onDelete('set null');
             $table->text('bio')->nullable();
             $table->enum('visibility', ['public', 'private'])->default('public');
             $table->timestamps();

@@ -104,4 +104,10 @@ interface LocationServiceInterface
      * @return City
      */
     public function getCityById(int $cityId): City;
+
+    /**
+     * Get phone codes.
+     *
+     */
+    public function getPhoneCodes();
 }

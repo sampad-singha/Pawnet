@@ -32,6 +32,7 @@ class UserProfile extends Model
         'date_of_birth' => 'date',
         'visibility' => 'string',
     ];
+
     /**
      * Get the user that owns the profile.
      */
