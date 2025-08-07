@@ -10,6 +10,7 @@ use Exception;
 use Rinvex\Country\CountryLoader;
 use Rinvex\Country\CountryLoaderException;
 use Twilio\Rest\Client;
+use Propaganistas\LaravelPhone\PhoneNumber;
 
 
 class UserProfileService implements UserProfileServiceInterface
@@ -38,11 +39,17 @@ class UserProfileService implements UserProfileServiceInterface
      * @param User $user
      * @param array $data
      * @return UserProfile
-     * @throws CountryLoaderException
      */
     public function createOrUpdateGeneralInfo(User $user, array $data): UserProfile
     {
         $profile = UserProfile::where('user_id', $user->id)->first();
+        // logic to modify phone_number before passing
+        if (isset($data['phone_number']))
+        {
+            $phone = new PhoneNumber($data['phone_number'], $data['country_iso2']);
+            $internationalFormat = $phone->formatE164();
+            $data['phone_number'] = $internationalFormat;
+        }
         if (!$profile) {
             $profile = $this->userProfileRepository->create($user->id, $data);
         } else {
@@ -71,25 +78,6 @@ class UserProfileService implements UserProfileServiceInterface
         } catch (Exception $e) {
             throw new Exception('Failed to update visibility: ' . $e->getMessage());
         }
-    }
-
-    /**
-     * @throws CountryLoaderException
-     */
-    public function getDialCodeList(){
-        $countries = CountryLoader::countries();
-        $countryDetails =[];
-        foreach ($countries as $country) {
-            $countryDetails[] = [
-                'name' => $country['name'],
-                'short_code' => strtolower($country['iso_3166_1_alpha2']),
-                'dialing_code' => '+' . $country['calling_code']
-            ];
-        }
-
-
-
-        return $countryDetails;
     }
 
     /**

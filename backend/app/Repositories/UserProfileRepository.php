@@ -3,7 +3,10 @@
 namespace App\Repositories;
 
 use App\Models\UserProfile;
+use App\Models\Util\Country;
 use App\Repositories\Interfaces\UserProfileRepositoryInterface;
+use libphonenumber\NumberParseException;
+use Propaganistas\LaravelPhone\PhoneNumber;
 
 class UserProfileRepository Implements UserProfileRepositoryInterface
 {
@@ -17,13 +20,20 @@ class UserProfileRepository Implements UserProfileRepositoryInterface
             'gender' => $data['gender'] ?? null,
             'phone_number' => $data['phone_number'] ?? '',
             'address' => $data['address'] ?? '',
-            'city' => $data['city'] ?? '',
-            'state' => $data['state'] ?? '',
-            'country' => $data['country'] ?? '',
+            'city_id' => $data['city_id'] ?? '',
+            'state_id' => $data['state_id'] ?? '',
+            'country_id' => $data['country_id'] ?? '',
             'visibility' => $data['visibility'] ?? 'public',
         ]);
+        $country = Country::find($data['country_id']);
+        $phone = new PhoneNumber($profile['phone_number'], $country);
+
+        // Format the number to the E.164 international standard
+        $internationalFormat = $phone->formatE164();
+        $profile->phone_number = $internationalFormat;
 
         $profile->save();
+
         return $profile;
     }
     public function update(int $id, array $data): UserProfile
