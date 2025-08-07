@@ -33,6 +33,5 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('location/countries/{countryId}/cities', [LocationController::class, 'getCitiesByCountry']);
     Route::get('location/countries', [LocationController::class, 'getAllCountries']);
+    Route::get('location/phone-codes', [LocationController::class, 'getPhoneCodes']);
 });
-
-Route::get('test', [UserProfileController::class, 'test']);
