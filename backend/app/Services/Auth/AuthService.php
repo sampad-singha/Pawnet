@@ -7,6 +7,7 @@ use App\Exceptions\API\Auth\InvalidCredentialsException;
 use App\Models\User;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Services\Auth\Interfaces\AuthServiceInterface;
+use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
@@ -81,12 +82,12 @@ class AuthService implements AuthServiceInterface
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function setPassword(User $user, string $newPassword): void
     {
         if ($user->set_password) {
-            throw new \Exception('Password already set.');
+            throw new Exception('Password already set.');
         }
 
         $this->userRepository->updatePassword($user, Hash::make($newPassword));
@@ -94,10 +95,13 @@ class AuthService implements AuthServiceInterface
         event(new PasswordChange($user));
     }
 
+    /**
+     * @throws Exception
+     */
     public function changePassword(User $user, string $currentPassword, string $newPassword): void
     {
         if (!Hash::check($currentPassword, $user->password)) {
-            throw new \Exception('Current password is incorrect.');
+            throw new Exception('Current password is incorrect.');
         }
 
         $this->userRepository->updatePassword($user, Hash::make($newPassword));

@@ -8,7 +8,6 @@ use App\Services\Auth\Interfaces\AuthServiceInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
-use Jenssegers\Agent\Agent;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class AuthController extends Controller
@@ -23,6 +22,7 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
         try {
@@ -36,8 +36,6 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-//        dd($request);
-
         $credentials = $request->validate([
             'email' => 'required|string|email',
             'password' => 'required|string',
