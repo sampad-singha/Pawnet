@@ -133,7 +133,7 @@ class UserProfileController extends Controller
     {
         $user = Auth::user();
         $profile = $user->userProfile()->first();
-        $phoneNumber = $profile->phone_number->getWithPlus();
+        $phoneNumber = $profile->phone_number;
         $this->authorize('updateUserProfile', $profile);
         try {
             $this->userProfileService->sendPhoneNumberVerificationCode($profile, $phoneNumber);
