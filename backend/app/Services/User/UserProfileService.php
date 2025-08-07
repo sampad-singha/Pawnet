@@ -7,8 +7,6 @@ use App\Models\UserProfile;
 use App\Repositories\Interfaces\UserProfileRepositoryInterface;
 use App\Services\User\Interfaces\UserProfileServiceInterface;
 use Exception;
-use Rinvex\Country\CountryLoader;
-use Rinvex\Country\CountryLoaderException;
 use Twilio\Rest\Client;
 use Propaganistas\LaravelPhone\PhoneNumber;
 
