@@ -3,6 +3,7 @@
 // User Authentication Routes
 
 use App\Http\Controllers\API\User\LocationController;
+use App\Http\Controllers\API\User\UserProfileController;
 
 require base_path('routes/Api/user_auth.php');
 
@@ -32,4 +33,5 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('location/countries/{countryId}/cities', [LocationController::class, 'getCitiesByCountry']);
     Route::get('location/countries', [LocationController::class, 'getAllCountries']);
+    Route::get('location/phone-codes', [LocationController::class, 'getPhoneCodes']);
 });

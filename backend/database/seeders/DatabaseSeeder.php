@@ -13,6 +13,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->call(RegionsTableSeeder::class);
+        $this->call(SubregionsTableSeeder::class);
+        $this->call(CountriesTableSeeder::class);
+        $this->call(StatesTableSeeder::class);
+        $this->call(CitiesTableSeeder::class);
 
         User::factory()->has(UserProfile::factory())->create([
             'name' => 'Test User',
@@ -20,11 +25,5 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->call(FriendSeeder::class);
-
-        $this->call(RegionsTableSeeder::class);
-        $this->call(SubregionsTableSeeder::class);
-        $this->call(CountriesTableSeeder::class);
-        $this->call(StatesTableSeeder::class);
-        $this->call(CitiesTableSeeder::class);
     }
 }

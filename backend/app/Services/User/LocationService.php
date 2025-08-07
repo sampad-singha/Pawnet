@@ -150,4 +150,17 @@ class LocationService implements LocationServiceInterface
         }
         return $city;
     }
+
+    public function getPhoneCodes()
+    {
+        $country = Country::all();
+        // return phonecode, iso2, country name
+        return $country->map(function ($country) {
+            return [
+                'phonecode' => '+'. $country->phonecode,
+                'iso2' => $country->iso2,
+                'name' => $country->name,
+            ];
+        });
+    }
 }

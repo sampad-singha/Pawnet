@@ -241,4 +241,17 @@ class LocationController extends Controller
             ], 500);
         }
     }
+
+    public function getPhoneCodes()
+    {
+        try {
+            $phoneCodes = $this->locationService->getPhoneCodes();
+            return response()->json($phoneCodes);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Something went wrong while fetching phone codes.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
