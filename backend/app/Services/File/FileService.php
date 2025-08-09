@@ -2,53 +2,36 @@
 
 namespace App\Services\File;
 
+use App\Repositories\Interfaces\FileRepositoryInterface;
 use App\Services\File\Interfaces\FileServiceInterface;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\UploadedFile;
 
 class FileService implements FileServiceInterface
 {
 
-    // Implement methods defined in FileServiceInterface here
-    // For example, methods for uploading, downloading, deleting files, etc.
+    protected FileRepositoryInterface $fileRepository;
 
-    // Example method
-    public function storeFilesPublic(UploadedFile $file, string $directory, Model $model, string $type = null)
+    public function __construct(FileRepositoryInterface $fileRepository)
     {
-        $path = Storage::disk('public')->putFile($directory, $file);
-
-        // 2. Create the file record in the database using the polymorphic relationship
-        return $model->files()->create([
-            'name' => $file->getClientOriginalName(),
-            'path' => $path,
-            'mime_type' => $file->getMimeType(),
-            'size' => $file->getSize(),
-            'type' => $type, // Use the provided file type
-        ]);
+        $this->fileRepository = $fileRepository;
     }
 
-    public function storeFilesPrivate(UploadedFile $file, string $directory, Model $model, string $type = null)
+    // Store file (using repository method)
+    public function storeFile(UploadedFile $file, string $directory, Model $model, string $type = null, ?string $disk = 'local'): mixed
     {
-        $path = Storage::putFile($directory, $file);
-
-        // 2. Create the file record in the database using the polymorphic relationship
-        return $model->files()->create([
-            'name' => $file->getClientOriginalName(),
-            'path' => $path,
-            'mime_type' => $file->getMimeType(),
-            'size' => $file->getSize(),
-            'type' => $type, // Use the provided file type
-        ]);
+        return $this->fileRepository->storeFile($file, $directory, $model, $type, $disk);
     }
 
-    public function downloadFile($fileId)
+    // Download file (using repository method)
+    public function downloadFile(int|string $fileId): mixed
     {
-        // Logic to handle file download
+        return $this->fileRepository->downloadFile($fileId);
     }
 
-    public function deleteFile($fileId)
+    // Delete file (using repository method)
+    public function deleteFile(int|string $fileId): bool
     {
-        // Logic to handle file deletion
+        return $this->fileRepository->deleteFile($fileId);
     }
 }

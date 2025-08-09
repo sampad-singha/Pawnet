@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Services\File\Interfaces;
+namespace App\Repositories\Interfaces;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 
-interface FileServiceInterface
+interface FileRepositoryInterface
 {
     /**
      * Store a file in the specified directory and associate it with a model.
@@ -17,7 +17,7 @@ interface FileServiceInterface
      * @param string|null $type
      * @return mixed
      */
-    public function storeFile(UploadedFile $file, string $directory, Model $model, string $type = null, ?string $disk = 'local'): mixed;
+    public function storeFile(UploadedFile $file, string $directory, Model $model, ?string $disk = 'local', string $type = null): mixed;
 
     /**
      * Download a file by its ID.

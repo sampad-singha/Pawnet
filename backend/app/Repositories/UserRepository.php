@@ -15,7 +15,7 @@ use Illuminate\Support\Str;
 
 class UserRepository implements UserRepositoryInterface
 {
-    protected $fileService;
+    protected FileService $fileService;
 
     public function __construct(FileService $fileService)
     {
@@ -60,19 +60,23 @@ class UserRepository implements UserRepositoryInterface
 
     public function findOrCreateGoogleUser($googleUser): User
     {
+        // Get avatar URL from Google
         $avatarUrl = $googleUser->avatar;
+
+        // Fetch the image content
         $imageContent = Http::get($avatarUrl)->body();
-        $tempFilePath = storage_path('app/public/temp/avatar_' . uniqid());
 
-        $tempDir = storage_path('app/public/temp');
-        if (!File::exists($tempDir)) {
-            File::makeDirectory($tempDir, 0755, true);
-        }
+        // Create an UploadedFile instance from the image content
+        $file = new UploadedFile(
+            tmpfile(), // Create a temporary file in PHP's memory
+            'avatar_' . uniqid(),
+            'image/jpeg', // Specify the MIME type
+            null, // You can add the file size if known
+            true // Indicate that it's a real file
+        );
 
-        File::put($tempFilePath, $imageContent);
-
-        // Create an instance of UploadedFile from the temporary file
-        $file = new UploadedFile($tempFilePath, 'avatar_' . uniqid(), null, null, true);
+        // Write the image content to the temporary file
+        file_put_contents($file->getPathname(), $imageContent);
 
 
         $user = User::where('email', $googleUser->getEmail())->first();
@@ -92,11 +96,7 @@ class UserRepository implements UserRepositoryInterface
         $newUser->set_password = false;
         $newUser->save();
 
-        $this->fileService->storeFilesPublic($file, 'avatars', $newUser, 'avatar');
-
-
-        // Optionally, delete the temporary file after use
-        File::delete($tempFilePath);
+        $this->fileService->storeFile($file, 'avatars', $newUser, 'avatar', 'public');
 
         return $newUser;
     }
@@ -121,21 +121,49 @@ class UserRepository implements UserRepositoryInterface
 
     public function findOrCreateFacebookUser($fbUser): User
     {
-        $user = User::where('email', $fbUser->getEmail())->first();
-        if ($user) {
-            $user->update(['facebook_id' => $fbUser->getId()]);
-            return $user;
-        }
-        $newUser = User::create([
-            'name' => $fbUser->getName(),
-            'email' => $fbUser->getEmail(),
-            'facebook_id' => $fbUser->getId(),
-            'password' => bcrypt(Str::random(16)),
-            'email_verified_at' => now(),
-        ]);
-        $newUser->set_password = false;
-        $newUser->save();
+        // Get the avatar URL from Facebook's user object (usually, Facebook provides the image URL)
+        $avatarUrl = "https://graph.facebook.com/{$fbUser->getId()}/picture?type=large"; // Facebook Profile Image URL
 
-        return $newUser;
+        // Fetch the image content
+        $imageContent = Http::get($avatarUrl)->body();
+
+        // Create an UploadedFile instance from the image content
+        $file = new UploadedFile(
+            tmpfile(), // Create a temporary file in PHP's memory
+            'avatar_' . uniqid(),
+            'image/jpeg', // Specify the MIME type (Assume the profile picture is in JPEG format)
+            null, // You can add the file size if known
+            true // Indicate that it's a real file
+        );
+
+        // Write the image content to the temporary file
+        file_put_contents($file->getPathname(), $imageContent);
+
+        // Find the user based on email
+        $user = User::where('email', $fbUser->getEmail())->first();
+
+        if ($user) {
+            // Update the existing user's Facebook ID
+            $user->update(['facebook_id' => $fbUser->getId()]);
+        } else {
+            // Create a new user if not found
+            $newUser = User::create([
+                'name' => $fbUser->getName(),
+                'email' => $fbUser->getEmail(),
+                'facebook_id' => $fbUser->getId(),
+                'password' => bcrypt(Str::random(16)),  // Random password
+                'email_verified_at' => now(),
+            ]);
+            $newUser->set_password = false;  // Set this if you don't want to let the user set a password
+            $newUser->save();
+
+            // Call the fileService to store the avatar image
+            $this->fileService->storeFile($file, 'avatars', $newUser, 'avatar', 'public');
+
+            return $newUser;
+        }
+
+        return $user;
     }
+
 }
