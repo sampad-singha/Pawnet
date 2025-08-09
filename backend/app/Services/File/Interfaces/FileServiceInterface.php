@@ -13,11 +13,10 @@ interface FileServiceInterface
      * @param UploadedFile $file
      * @param string $directory
      * @param Model $model
-     * @param string|null $disk
      * @param string|null $type
      * @return mixed
      */
-    public function storeFile(UploadedFile $file, string $directory, Model $model, string $type = null, ?string $disk = 'local'): mixed;
+    public function storeFile(UploadedFile $file, string $directory, Model $model, string $type = null): mixed;
 
     /**
      * Download a file by its ID.

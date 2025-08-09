@@ -90,7 +90,7 @@ class UserRepository implements UserRepositoryInterface
         $newUser->set_password = false;
         $newUser->save();
 
-        $this->fileService->storeFile($file, 'avatars', $newUser, 'avatar', 'public');
+        $this->fileService->storeFile($file, 'avatars', $newUser, 'avatar');
 
 
         // Optionally, delete the temporary file after use
@@ -165,7 +165,7 @@ class UserRepository implements UserRepositoryInterface
             $newUser->save();
 
             // Store the file (avatar) using the fileService's storeFile method
-            $this->fileService->storeFile($file, 'avatars', $newUser, 'avatar', 'public');
+            $this->fileService->storeFile($file, 'avatars', $newUser, 'avatar');
 
             // Optionally, delete the temporary file after the upload is done
             File::delete($tempFilePath);

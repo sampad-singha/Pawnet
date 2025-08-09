@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Interfaces;
 
+use App\Models\Util\File;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 
@@ -13,19 +14,18 @@ interface FileRepositoryInterface
      * @param UploadedFile $file
      * @param string $directory
      * @param Model $model
-     * @param string|null $disk
      * @param string|null $type
      * @return mixed
      */
-    public function storeFile(UploadedFile $file, string $directory, Model $model, string $type = null, ?string $disk = 'local'): mixed;
+    public function storeFile(UploadedFile $file, string $directory, Model $model, string $type = null): mixed;
 
     /**
      * Download a file by its ID.
      *
-     * @param int|string $fileId
+     * @param File $file
      * @return mixed
      */
-    public function downloadFile(int|string $fileId): mixed;
+    public function downloadFile(File $file): mixed;
 
     /**
      * Delete a file by its ID.

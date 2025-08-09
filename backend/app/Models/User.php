@@ -7,7 +7,6 @@ use App\Models\Util\File;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
@@ -107,17 +106,6 @@ class User extends Authenticatable
     {
         return $this->morphOne(File::class, 'attachable')->where('type', 'avatar');
     }
-
-    /**
-     * // Access the user's avatar file
-     * $user = User::find(1);
-     * $avatarFile = $user->avatar;
-     *
-     * if ($avatarFile) {
-     * // Get the path and display the avatar
-     * $avatarPath = $avatarFile->path;
-     * }
-     */
 
 
 }

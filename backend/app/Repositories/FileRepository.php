@@ -5,16 +5,21 @@
 namespace App\Repositories;
 
 use App\Repositories\Interfaces\FileRepositoryInterface;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use App\Models\Util\File;  // Assuming a File model that stores file metadata
+use App\Models\Util\File;
 
 class FileRepository implements FileRepositoryInterface
 {
-    // Store file in the specified disk (local, public, private, S3)
-    public function storeFile(UploadedFile $file, string $directory, Model $model, string $type = null, ?string $disk = 'local'): mixed
+    // Store file on the default disk (configured in filesystems.php)
+    public function storeFile(UploadedFile $file, string $directory, Model $model, string $type = null): mixed
     {
+        // Use the default disk (no need for disk parameter)
+        $disk = config('filesystems.default');
+
+        // Store the file on the default disk
         $path = Storage::disk($disk)->putFile($directory, $file);
 
         // Create a record in the database with file metadata
@@ -28,50 +33,38 @@ class FileRepository implements FileRepositoryInterface
     }
 
     // Download file (generalized for both public and private files)
-    public function downloadFile(int|string $fileId): mixed
+    /**
+     * @throws Exception
+     */
+    public function downloadFile(File $file): mixed
     {
-        $file = File::find($fileId);
-        if (!$file) {
-            throw new \Exception('File not found');
-        }
-
-        // Handle public and private file download differently
-        if ($this->isFilePublic($file)) {
-            return Storage::disk('public')->download($file->path, $file->name);
-        } else {
-            return $this->generateTemporaryUrl($file);
-        }
+        // Handle file download using the default disk
+        return $this->generateTemporaryUrl($file);
     }
 
     // Delete file (generalized for any disk)
-
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function deleteFile(int|string $fileId): bool
     {
         $file = File::find($fileId);
         if (!$file) {
-            throw new \Exception('File not found');
+            throw new Exception('File not found');
         }
 
         // Delete the file from the appropriate disk
-        Storage::disk($this->getDiskFromPath($file->path))->delete($file->path);
+        $disk = config('filesystems.default');
+        Storage::disk($disk)->delete($file->path);
 
         // Delete the record from the database
         return $file->delete();
     }
 
-    // Check if file is public based on path or disk
-    protected function isFilePublic($file): bool
-    {
-        return str_contains($file->path, 'public');
-    }
-
-    // Generate temporary URL for private files
+    // Generate temporary URL for private files (works for all disks)
     protected function generateTemporaryUrl($file): string
     {
-        $disk = 'private';  // Assuming 'private' disk for local or cloud storage
+        $disk = config('filesystems.default');
         $url = Storage::disk($disk)->temporaryUrl(
             $file->path,
             now()->addMinutes(5),  // URL expires in 5 minutes
@@ -79,17 +72,6 @@ class FileRepository implements FileRepositoryInterface
         );
 
         return redirect()->away($url);
-    }
-
-    // Get disk dynamically based on file path (could be enhanced if needed)
-    protected function getDiskFromPath($path): string
-    {
-        // Check if the file is stored in public or private disk
-        if (str_contains($path, 'public')) {
-            return 'public';
-        }
-
-        return 'private';  // Default to private storage
     }
 }
 

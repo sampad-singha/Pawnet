@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\Auth;
 use App\Exceptions\API\Auth\InvalidCredentialsException;
 use App\Http\Controllers\Controller;
 use App\Services\Auth\Interfaces\AuthServiceInterface;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
@@ -15,6 +16,22 @@ class AuthController extends Controller
     public function __construct(
         private AuthServiceInterface $authService
     ) {}
+
+    public function user()
+    {
+        try {
+            $this->authService->getUser();
+            return response()->json([
+                'message' => 'User authenticated successfully',
+                'user' => auth()->user(),
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'error' => 'Unauthorized',
+                'message' => $e->getMessage(),
+            ], 401);
+        }
+    }
 
     public function register(Request $request)
     {
@@ -49,7 +66,10 @@ class AuthController extends Controller
             return response()->json(['error' => $e->getMessage()], 401);
         } catch (\Throwable $e) {
             Log::error('Login error', ['error' => $e->getMessage()]);
-            return response()->json(['error' => 'Login failed'], 500);
+            return response()->json([
+                'error' => 'Login failed',
+                'message' => $e->getMessage(),
+            ], 500);
         }
     }
 
@@ -105,7 +125,7 @@ class AuthController extends Controller
         try {
             $this->authService->setPassword(auth()->user(), $data['new_password']);
             return response()->json(['message' => 'Password set successfully']);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 403);
         }
     }
@@ -120,7 +140,7 @@ class AuthController extends Controller
         try {
             $this->authService->changePassword(auth()->user(), $data['current_password'], $data['new_password']);
             return response()->json(['message' => 'Password changed successfully']);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 403);
         }
     }
