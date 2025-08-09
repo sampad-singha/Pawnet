@@ -7,6 +7,8 @@ use App\Services\Auth\AuthService;
 use App\Services\Auth\GoogleAuthService;
 use App\Services\Auth\Interfaces\AuthServiceInterface;
 use App\Services\Auth\Interfaces\GoogleAuthServiceInterface;
+use App\Services\File\FileService;
+use App\Services\File\Interfaces\FileServiceInterface;
 use App\Services\User\FriendService;
 use App\Services\User\Interfaces\FriendServiceInterface;
 use App\Services\User\Interfaces\LocationServiceInterface;
@@ -27,7 +29,6 @@ class ServiceServiceProvider extends ServiceProvider
             GoogleAuthServiceInterface::class,
             GoogleAuthService::class
         );
-        // Bind the FriendServiceInterface to FriendService
         $this->app->bind(
             FriendServiceInterface::class,
             FriendService::class
@@ -39,6 +40,10 @@ class ServiceServiceProvider extends ServiceProvider
         $this->app->bind(
             LocationServiceInterface::class,
             LocationService::class
+        );
+        $this->app->bind(
+            FileServiceInterface::class,
+            FileService::class
         );
 
     }
