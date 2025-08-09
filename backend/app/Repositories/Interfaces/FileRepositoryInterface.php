@@ -17,7 +17,7 @@ interface FileRepositoryInterface
      * @param string|null $type
      * @return mixed
      */
-    public function storeFile(UploadedFile $file, string $directory, Model $model, ?string $disk = 'local', string $type = null): mixed;
+    public function storeFile(UploadedFile $file, string $directory, Model $model, string $type = null, ?string $disk = 'local'): mixed;
 
     /**
      * Download a file by its ID.

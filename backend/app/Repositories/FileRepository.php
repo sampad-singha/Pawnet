@@ -13,7 +13,7 @@ use App\Models\Util\File;  // Assuming a File model that stores file metadata
 class FileRepository implements FileRepositoryInterface
 {
     // Store file in the specified disk (local, public, private, S3)
-    public function storeFile(UploadedFile $file, string $directory, Model $model, ?string $disk = 'local', string $type = null): mixed
+    public function storeFile(UploadedFile $file, string $directory, Model $model, string $type = null, ?string $disk = 'local'): mixed
     {
         $path = Storage::disk($disk)->putFile($directory, $file);
 
