@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use Throwable;
 
 class AuthController extends Controller
 {
@@ -45,7 +46,7 @@ class AuthController extends Controller
         try {
             $user = $this->authService->register($data);
             return response()->json(['user' => $user], 201);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Log::error('Registration failed', ['error' => $e->getMessage()]);
             return response()->json(['error' => 'Registration failed'], 500);
         }
@@ -64,7 +65,7 @@ class AuthController extends Controller
             return response()->json($response, 200);
         } catch (InvalidCredentialsException $e) {
             return response()->json(['error' => $e->getMessage()], 401);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Log::error('Login error', ['error' => $e->getMessage()]);
             return response()->json([
                 'error' => 'Login failed',
