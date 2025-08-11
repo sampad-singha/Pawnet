@@ -119,6 +119,21 @@
       <excludeFolder url="file://$MODULE_DIR$/backend/vendor/vlucas/phpdotenv" />
       <excludeFolder url="file://$MODULE_DIR$/backend/vendor/voku/portable-ascii" />
       <excludeFolder url="file://$MODULE_DIR$/backend/vendor/webmozart/assert" />
+      <excludeFolder url="file://$MODULE_DIR$/backend/vendor/firebase/php-jwt" />
+      <excludeFolder url="file://$MODULE_DIR$/backend/vendor/giggsey/libphonenumber-for-php-lite" />
+      <excludeFolder url="file://$MODULE_DIR$/backend/vendor/jaybizzle/crawler-detect" />
+      <excludeFolder url="file://$MODULE_DIR$/backend/vendor/jenssegers/agent" />
+      <excludeFolder url="file://$MODULE_DIR$/backend/vendor/laravel/sanctum" />
+      <excludeFolder url="file://$MODULE_DIR$/backend/vendor/laravel/socialite" />
+      <excludeFolder url="file://$MODULE_DIR$/backend/vendor/league/oauth1-client" />
+      <excludeFolder url="file://$MODULE_DIR$/backend/vendor/mobiledetect/mobiledetectlib" />
+      <excludeFolder url="file://$MODULE_DIR$/backend/vendor/orangehill/iseed" />
+      <excludeFolder url="file://$MODULE_DIR$/backend/vendor/paragonie/constant_time_encoding" />
+      <excludeFolder url="file://$MODULE_DIR$/backend/vendor/paragonie/random_compat" />
+      <excludeFolder url="file://$MODULE_DIR$/backend/vendor/phpseclib/phpseclib" />
+      <excludeFolder url="file://$MODULE_DIR$/backend/vendor/propaganistas/laravel-phone" />
+      <excludeFolder url="file://$MODULE_DIR$/backend/vendor/rinvex/countries" />
+      <excludeFolder url="file://$MODULE_DIR$/backend/vendor/twilio/sdk" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
