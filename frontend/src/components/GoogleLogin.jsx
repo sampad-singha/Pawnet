@@ -1,7 +1,7 @@
 import React from 'react';
 import {Button} from "@mui/joy";
 import { Google as GoogleIcon} from '@mui/icons-material';
-import api from "../Api.jsx";
+import api from "../services/Api.jsx";
 import GoogleCallback from "./GoogleCallback.jsx";
 
 const GoogleLogin = () => {

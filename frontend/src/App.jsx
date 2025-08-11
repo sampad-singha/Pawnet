@@ -1,66 +1,85 @@
-import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import axios from './Api.jsx';  // Axios instance
-import Home from './pages/Home.jsx';  // Private route
-import Login from './pages/Login.jsx';  // Public route
-import Register from './pages/Register.jsx';  // Public route
-import Dashboard from './pages/Dashboard.jsx';
-import GoogleCallback from './components/GoogleCallback.jsx';
-import FacebookCallback from './components/FacebookCallback.jsx';  // Private route
-import Logout from './components/Logout.jsx';
+import React from 'react'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { Toaster } from 'react-hot-toast'
+import { ThemeProvider } from './contexts/ThemeContext'
+import { AuthProvider } from './contexts/AuthContext'
+import { ROUTES } from './utils/constants'
+import ProtectedRoute from './components/common/ProtectedRoute'
+import Layout from './components/layout/Layout'
 
-// Component for handling private routes
-const PrivateRoute = ({ children }) => {
-    const [auth, setAuth] = useState(null);  // Use null to signify loading
-    const [loading, setLoading] = useState(true); // For loading state
-
-    useEffect(() => {
-        // Check if the user is authenticated by looking for the token
-        const token = localStorage.getItem('authToken');
-        if (!token) {
-            setAuth(false);  // No token, mark as not authenticated
-            setLoading(false); // Done loading
-        } else {
-            // Optionally check token validity or refresh
-            axios.get('/user/verify-token')  // You can replace this with your API route
-                .then(() => {
-                    setAuth(true);
-                    setLoading(false); // Done loading
-                })
-                .catch(() => {
-                    setAuth(false);
-                    setLoading(false); // Done loading
-                });
-        }
-    }, []);
-
-    if (loading) {
-        return <div>Loading...</div>;  // Show loading until authentication check is complete
-    }
-
-    return auth ? children : <Navigate to="/login" />;  // Redirect to login if not authenticated
-};
+// Pages
+import Login from './pages/auth/Login'
+import Register from './pages/auth/Register'
+import ForgotPassword from './pages/auth/ForgotPassword'
+import ResetPassword from './pages/auth/ResetPassword'
+import Dashboard from './pages/Dashboard'
+import Profile from './pages/Profile'
+import NotFound from './pages/NotFound'
 
 function App() {
     return (
-        <Router>
-            <Routes>
-                {/* Public routes */}
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/auth/google/callback" element={<GoogleCallback />} />
-                <Route path="/auth/facebook/callback" element={<FacebookCallback />} />
+        <ThemeProvider>
+            <AuthProvider>
+                <Router>
+                    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+                        <Routes>
+                            {/* Public routes */}
+                            <Route path={ROUTES.LOGIN} element={<Login />} />
+                            <Route path={ROUTES.REGISTER} element={<Register />} />
+                            <Route path={ROUTES.FORGOT_PASSWORD} element={<ForgotPassword />} />
+                            <Route path={ROUTES.RESET_PASSWORD} element={<ResetPassword />} />
 
-                {/* Private routes */}
-                <Route path="/dashboard" element={<PrivateRoute> <Dashboard /> </PrivateRoute>} />
-                <Route path="/home" element={<PrivateRoute> <Home /> </PrivateRoute>} />
-                <Route path="/logout" element={<PrivateRoute> <Logout /> </PrivateRoute>} />
+                            {/* Protected routes */}
+                            <Route
+                                path={ROUTES.HOME}
+                                element={
+                                    <ProtectedRoute>
+                                        <Navigate to={ROUTES.DASHBOARD} replace />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path={ROUTES.DASHBOARD}
+                                element={
+                                    <ProtectedRoute>
+                                        <Layout>
+                                            <Dashboard />
+                                        </Layout>
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path={ROUTES.PROFILE}
+                                element={
+                                    <ProtectedRoute>
+                                        <Layout>
+                                            <Profile />
+                                        </Layout>
+                                    </ProtectedRoute>
+                                }
+                            />
 
-                {/* Redirect to login if no match */}
-                <Route path="*" element={<Navigate to="/login" />} />
-            </Routes>
-        </Router>
-    );
+                            {/* 404 page */}
+                            <Route path="*" element={<NotFound />} />
+                        </Routes>
+
+                        {/* Toast notifications */}
+                        <Toaster
+                            position="top-right"
+                            toastOptions={{
+                                duration: 4000,
+                                style: {
+                                    background: 'var(--toast-bg)',
+                                    color: 'var(--toast-color)',
+                                },
+                                className: 'dark:bg-gray-800 dark:text-white',
+                            }}
+                        />
+                    </div>
+                </Router>
+            </AuthProvider>
+        </ThemeProvider>
+    )
 }
 
-export default App;
+export default App

@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { Button, Container, Box, Typography, Input, FormControl, FormLabel, Link } from '@mui/joy';
-import api from "../Api.jsx"; // Import the API service
-import GoogleLogin from "../components/GoogleLogin.jsx";
-import FacebookLogin from "../components/FacebookLogin.jsx";
+import api from "../services/Api"; // Import the API service
+import GoogleLogin from "../components/GoogleLogin";
+import FacebookLogin from "../components/FacebookLogin";
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false); // For loading state
     const navigate = useNavigate(); // Initialize useNavigate hook
 
     const handleSubmit = async (e) => {
@@ -16,6 +17,7 @@ const Login = () => {
 
         // Clear previous error if any
         setError('');
+        setLoading(true); // Start loading
 
         try {
             // Make the POST request to the /login endpoint
@@ -27,11 +29,15 @@ const Login = () => {
             // Assuming the backend returns a token on successful login
             const { token } = response.data;
 
-            // Store the token in localStorage or sessionStorage for further requests
+            // Store the token in localStorage for further requests
             localStorage.setItem('authToken', token);
 
+            // Clear form fields after successful login
+            setEmail('');
+            setPassword('');
+
             // Redirect the user to the dashboard or protected page using useNavigate
-            navigate('/dashboard');  // This will trigger client-side navigation without reloading the page
+            navigate('/dashboard'); // This will trigger client-side navigation without reloading the page
         } catch (err) {
             console.error('Login error:', err);
 
@@ -39,11 +45,11 @@ const Login = () => {
             if (err.response) {
                 // Error response from the server (e.g., invalid credentials, etc.)
                 if (err.response.status === 401) {
-                    setError('Invalid email or password. Please try again.');
+                    setError('Invalid email or password. Please try again.'); // Clearer error message for 401
                 } else if (err.response.status === 500) {
-                    setError('Server error. Please try again later.');
+                    setError('Server error. Please try again later.'); // Server error handling
                 } else {
-                    setError('Something went wrong. Please try again.');
+                    setError('Something went wrong. Please try again.'); // Generic error handling
                 }
             } else if (err.request) {
                 // The request was made, but no response was received (network error)
@@ -52,6 +58,8 @@ const Login = () => {
                 // Other unexpected errors
                 setError('An unexpected error occurred. Please try again.');
             }
+        } finally {
+            setLoading(false); // Stop loading after the request completes
         }
     };
 
@@ -104,7 +112,7 @@ const Login = () => {
 
                     {error && (
                         <Typography color="error" align="center" marginTop={2}>
-                            {error}
+                            {error} {/* Display the error message dynamically */}
                         </Typography>
                     )}
 
@@ -113,8 +121,9 @@ const Login = () => {
                         variant="soft"
                         color="primary"
                         sx={{ marginTop: 2 }}
+                        disabled={loading} // Disable the button while loading
                     >
-                        Login
+                        {loading ? 'Logging in...' : 'Login'}
                     </Button>
 
                     <Box sx={{ textAlign: 'center', marginTop: 2 }}>

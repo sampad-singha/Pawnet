@@ -42,7 +42,7 @@ class AuthService implements AuthServiceInterface
         $user = $this->userRepository->findByEmail($email);
 
         if (!$user || !Hash::check($credentials['password'], $user->password)) {
-            throw new InvalidCredentialsException('Invalid credentials');
+            throw new InvalidCredentialsException('Invalid credentials provided.');
         }
         $user->load('avatar');
         // Add avatar URL as a dynamic property to the user model
