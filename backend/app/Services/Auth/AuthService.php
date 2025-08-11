@@ -7,9 +7,11 @@ use App\Exceptions\API\Auth\InvalidCredentialsException;
 use App\Models\User;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Services\Auth\Interfaces\AuthServiceInterface;
-use Illuminate\Support\Facades\DB;
+use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -42,6 +44,16 @@ class AuthService implements AuthServiceInterface
         if (!$user || !Hash::check($credentials['password'], $user->password)) {
             throw new InvalidCredentialsException('Invalid credentials');
         }
+        $user->load('avatar');
+        // Add avatar URL as a dynamic property to the user model
+        if (isset($user->avatar)) {
+            $avatarPath = $user->avatar->path;  // Get the path of the avatar
+            $user->avatar_url = Storage::url($avatarPath);  // Automatically uses the default disk
+        } else {
+            // If no avatar, set avatar_url to null or a default image URL
+            $user->avatar_url = null;
+        }
+
         event(new NewLogin($user));
         return $this->generateAuthResponse($user, $userAgent);
     }
@@ -59,7 +71,19 @@ class AuthService implements AuthServiceInterface
 
     public function getUser(): ?User
     {
-        return auth()->user();
+        $user = Auth::user()->load('avatar');
+
+        // Check if the user has an avatar and generate the avatar URL if it exists
+        if ($user->avatar) {
+            $avatarPath = $user->avatar->path;  // Get the path of the avatar
+            $user->avatar_url = Storage::url($avatarPath);  // Automatically uses the default disk
+        } else {
+            // If no avatar, set avatar_url to null or a default image URL
+            $user->avatar_url = null;
+        }
+
+        // Return the user with avatar URL added as a dynamic property
+        return $user;
     }
 
     public function refreshToken(User $user, string $userAgent): array
@@ -81,12 +105,12 @@ class AuthService implements AuthServiceInterface
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function setPassword(User $user, string $newPassword): void
     {
         if ($user->set_password) {
-            throw new \Exception('Password already set.');
+            throw new Exception('Password already set.');
         }
 
         $this->userRepository->updatePassword($user, Hash::make($newPassword));
@@ -94,10 +118,13 @@ class AuthService implements AuthServiceInterface
         event(new PasswordChange($user));
     }
 
+    /**
+     * @throws Exception
+     */
     public function changePassword(User $user, string $currentPassword, string $newPassword): void
     {
         if (!Hash::check($currentPassword, $user->password)) {
-            throw new \Exception('Current password is incorrect.');
+            throw new Exception('Current password is incorrect.');
         }
 
         $this->userRepository->updatePassword($user, Hash::make($newPassword));
