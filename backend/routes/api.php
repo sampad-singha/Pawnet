@@ -2,6 +2,7 @@
 
 // User Authentication Routes
 
+use App\Http\Controllers\API\File\UploadFileController;
 use App\Http\Controllers\API\User\LocationController;
 use App\Http\Controllers\API\User\UserProfileController;
 
@@ -35,3 +36,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('location/countries', [LocationController::class, 'getAllCountries']);
     Route::get('location/phone-codes', [LocationController::class, 'getPhoneCodes']);
 });
+
+Route::post('/chunk-upload', UploadFileController::class);
+Route::patch('/chunk-upload', UploadFileController::class);
