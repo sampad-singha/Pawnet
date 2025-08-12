@@ -4,7 +4,6 @@
 
 use App\Http\Controllers\API\File\UploadFileController;
 use App\Http\Controllers\API\User\LocationController;
-use App\Http\Controllers\API\User\UserProfileController;
 
 require base_path('routes/Api/user_auth.php');
 

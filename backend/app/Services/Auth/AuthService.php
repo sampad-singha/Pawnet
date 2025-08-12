@@ -18,7 +18,7 @@ use Illuminate\Validation\ValidationException;
 class AuthService implements AuthServiceInterface
 {
     public function __construct(
-        private UserRepositoryInterface $userRepository,
+        private readonly UserRepositoryInterface $userRepository,
         protected TokenNameService $tokenNameService
     ) {}
 
@@ -99,7 +99,7 @@ class AuthService implements AuthServiceInterface
 
         return [
             'user' => $user,
-            'token' => $token,
+            'access_token' => $token,
             'token_type' => 'Bearer'
         ];
     }

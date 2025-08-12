@@ -15,13 +15,17 @@ return [
     |
     */
 
-    'paths' => ['api/*', 'sanctum/csrf-cookie', 'auth/google/redirect', 'auth/google/callback'],
-
+    'paths' => ['api/*', 'sanctum/csrf-cookie', 'auth/google/redirect', 'auth/google/callback', 'user'],
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*', 'http://localhost:5173', 'http://127.0.0.1:5173'],
+    'allowed_origins' => ['*',
+        'http://localhost:5173',
+        'http://127.0.0.1:5173',
+        'https://localhost:3000',
+        'http://127.0.0.1:3000',
+    ],
 
-    'allowed_origins_patterns' => [],
+    'allowed_origins_patterns' => ['http://localhost:*', 'http://127.0.0.1:*'],
 
     'allowed_headers' => ['*'],
 

@@ -24,18 +24,17 @@ class UploadFileController extends Controller
      */
     public function __invoke(Request $request)
     {
-        if($request->file('chunkfile')){
+        if ($request->file('chunkfile')) {
             $folderName = $this->fileService->simpleUpload($request->file('chunkfile'));
-            if($folderName) return response()->json($folderName, ResponseAlias::HTTP_OK);
+            if ($folderName)  return response()->json(['folderPath' => $folderName], ResponseAlias::HTTP_OK);
             return response()->json('error', ResponseAlias::HTTP_NOT_ACCEPTABLE);
-        }elseif( $request->method() == 'POST')
-        {
+        } elseif ($request->method() == 'POST') {
             $folderName = $this->fileService->startChunkProcess();
-            if($folderName) return response()->json($folderName, ResponseAlias::HTTP_OK);
+            if ($folderName) return response()->json($folderName, ResponseAlias::HTTP_OK);
             return response()->json('error', ResponseAlias::HTTP_NOT_ACCEPTABLE);
-        }else{
+        } else {
             $result = $this->fileService->processChunkUploads($request);
-            if(!$result) return response()->json('error', ResponseAlias::HTTP_NOT_ACCEPTABLE);
+            if (!$result) return response()->json('error', ResponseAlias::HTTP_NOT_ACCEPTABLE);
         }
 
         return response()->json('success', ResponseAlias::HTTP_OK);
