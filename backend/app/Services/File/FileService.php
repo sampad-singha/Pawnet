@@ -53,6 +53,11 @@ class FileService implements FileServiceInterface
         return $this->fileRepository->deleteFile($fileId);
     }
 
+
+
+
+
+//    --------------------------File Upload Methods (No DB Operations)--------------------------
     public function simpleUpload(UploadedFile $file): string
     {
         $folder = uniqid(). '-' . now()->timestamp;

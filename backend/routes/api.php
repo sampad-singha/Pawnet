@@ -38,3 +38,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::post('/chunk-upload', UploadFileController::class);
 Route::patch('/chunk-upload', UploadFileController::class);
+
+
+Route::post('/test', function (Request $request) {
+    $data = $request->all();
+    dd($data);
+    return response()->json(['message' => 'Test route hit successfully', 'data' => $data], 200);
+});
